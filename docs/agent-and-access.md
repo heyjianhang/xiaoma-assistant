@@ -93,7 +93,7 @@ flowchart LR
 
 ## 上线配置
 
-本机已运行；公网部署尚未执行。部署时需使用 HTTPS，将 `WEB_ORIGIN` 设为实际前端域名并设置 `AUTH_COOKIE_SECURE=true`。Next.js 与 API 使用同源代理；数据库与 API 端口保留内网/回环访问，不直接暴露旧调试服务。Python 服务必须从 `scripts/dev.sh` 指定的 FastAPI 入口启动；生产进程管理可改用同一 `xiaoma.app:app`，不要另起未经此认证边界保护的图服务。
+已完成本地运行及公网 HTTPS 功能验收，复现步骤见 [部署说明](deployment.md)。部署时需使用 HTTPS，将 `WEB_ORIGIN` 设为实际前端域名并设置 `AUTH_COOKIE_SECURE=true`。Next.js 与 API 使用同源代理；数据库与 API 端口保留内网/回环访问，不直接暴露旧调试服务。Python 服务必须从 `scripts/dev.sh` 指定的 FastAPI 入口启动；生产进程管理可改用同一 `xiaoma.app:app`，不要另起未经此认证边界保护的图服务。
 
 反向代理应关闭 SSE 缓冲、允许长连接、限制请求体并配置基础请求限流。原文件和 MinerU ZIP 位于 var，不放到公开静态目录。API 文档可查看接口契约；执行业务请求仍需签名，普通 curl Cookie 不能代替设备证明。
 

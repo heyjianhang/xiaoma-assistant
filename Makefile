@@ -1,4 +1,4 @@
-.PHONY: check check-backend check-web check-repository
+.PHONY: check check-backend check-web check-repository package
 
 check: check-backend check-web check-repository
 
@@ -18,3 +18,6 @@ check-web:
 
 check-repository:
 	python3 scripts/check_repository.py
+
+package:
+	python3 scripts/package_submission.py

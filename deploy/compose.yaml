@@ -1,0 +1,101 @@
+name: xiaoma-assistant-production
+
+x-logs: &logs
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+x-api-build: &api-build
+  context: ..
+  dockerfile: deploy/Dockerfile.api
+
+x-app: &app
+  image: xiaoma-assistant-api:local
+  build: *api-build
+  init: true
+  restart: unless-stopped
+  user: "${APP_UID:-1000}:${APP_GID:-1000}"
+  volumes:
+    - ../.env:/app/.env:ro
+    - ../var/documents:/app/var/documents
+  environment:
+    BACKGROUND_WORKERS_ENABLED: "false"
+  depends_on:
+    postgres:
+      condition: service_healthy
+  logging: *logs
+  stop_grace_period: 60s
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: xiaoma
+      POSTGRES_DB: xiaoma
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run init_local.py and keep .env private}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U xiaoma -d xiaoma"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    logging: *logs
+
+  # One-off trusted initialization: bind the source directory so dotenv can
+  # atomically update .env. The runtime services only mount that file read-only.
+  setup:
+    profiles: ["setup"]
+    image: xiaoma-assistant-api:local
+    build: *api-build
+    user: "${APP_UID:-1000}:${APP_GID:-1000}"
+    working_dir: /app
+    volumes:
+      - ..:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["sh", "-c", "python scripts/init_queue.py && python scripts/import_business.py && python scripts/init_access.py"]
+    logging: *logs
+
+  api:
+    <<: *app
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:2025/api/health', timeout=5)"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  worker:
+    <<: *app
+    command: ["python", "-m", "xiaoma.worker"]
+
+  web:
+    image: xiaoma-assistant-web:local
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.web
+    init: true
+    restart: unless-stopped
+    environment:
+      HOSTNAME: 0.0.0.0
+      PORT: "3002"
+      BACKEND_URL: http://api:2025
+    ports:
+      - "127.0.0.1:${WEB_PORT:-48940}:3002"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3002/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 20s
+    logging: *logs
+
+volumes:
+  postgres-data:

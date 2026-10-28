@@ -4,6 +4,7 @@ This deliberately reports locations only, never matched secret values. It is a
 repository hygiene check, not a substitute for a security audit or semantic eval.
 """
 
+import hashlib
 import json
 import re
 import subprocess
@@ -32,18 +33,59 @@ LINK = re.compile(r"\[[^\]\n]*\]\(<?([^\s)>]+)>?(?:\s+[^)]*)?\)")
 
 
 def candidates() -> list[Path]:
-    result = subprocess.run(
-        ["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"],
-        cwd=ROOT,
-        check=True,
-        capture_output=True,
-    )
-    return sorted({Path(name) for name in result.stdout.decode().split("\0") if name})
+    try:
+        repository = subprocess.run(
+            ["git", "rev-parse", "--show-toplevel"], cwd=ROOT, capture_output=True, check=False
+        )
+    except FileNotFoundError:
+        repository = None
+    if (
+        repository is not None
+        and repository.returncode == 0
+        and Path(repository.stdout.decode().strip()).resolve() == ROOT
+    ):
+        result = subprocess.run(
+            ["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+        )
+        return sorted({Path(name) for name in result.stdout.decode().split("\0") if name})
+
+    # Source ZIPs deliberately omit .git. Verify their explicit file manifest;
+    # never recursively collect newly generated credentials or runtime files.
+    manifest = ROOT / "SUBMISSION_MANIFEST.json"
+    if not manifest.is_file():
+        raise ValueError("Run inside the Git checkout or an extracted submission ZIP")
+    entries = json.loads(manifest.read_text())["files"]
+    paths = []
+    for entry in entries:
+        relative = Path(entry["path"])
+        path = ROOT / relative
+        if (
+            relative.is_absolute()
+            or ".." in relative.parts
+            or "\\" in entry["path"]
+            or path.is_symlink()
+            or not path.resolve().is_relative_to(ROOT)
+            or not path.is_file()
+        ):
+            raise ValueError("Invalid submission path: " + entry["path"])
+        if hashlib.sha256(path.read_bytes()).hexdigest() != entry["sha256"]:
+            raise ValueError("Submission checksum mismatch: " + entry["path"])
+        paths.append(relative)
+    if len(set(paths)) != len(paths):
+        raise ValueError("Duplicate submission manifest path")
+    return sorted([*paths, Path("SUBMISSION_MANIFEST.json")])
 
 
 def main() -> int:
     problems: list[str] = []
-    paths = candidates()
+    try:
+        paths = candidates()
+    except (OSError, ValueError, KeyError) as exc:
+        print(f"Repository input check failed: {exc}", file=sys.stderr)
+        return 1
     for relative in paths:
         name = relative.as_posix()
         if (

@@ -4,6 +4,15 @@
 
 评审入口：[关键设计决策](DECISIONS.md) · [需求对照](docs/requirements.md) · [架构](docs/architecture.md) · [测试与验收](docs/testing.md) · [验证记录](docs/validation.md)
 
+## 评审顺序
+
+1. 按下方步骤启动，上传演示 PDF；不依赖作者的数据库快照或私有文件。
+2. 在聊天页“更多用例”查看问题与预期，依次体验文档、SQL、综合核对、歧义、冲突；默认两类工具均开启，系统自动选路。
+3. 对照 [需求矩阵](docs/requirements.md) 查看实现位置，再阅读 [DECISIONS](DECISIONS.md) 的三个取舍。
+4. 按 [测试说明](docs/testing.md) 复现自动化检查；[验证记录](docs/validation.md) 区分受控测试、真实调用和未测指标。
+
+在线演示已通过 HTTPS 部署。访问凭据由作者通过邀请单独提供，不写入仓库；本地复现使用自己的服务密钥和初始化生成的管理员密码。
+
 ## 能力
 
 | 能力 | 实现 |
@@ -19,22 +28,36 @@
 | 访问控制 | 管理员密码登录；邀请带有效期，首次兑换绑定浏览器；聊天按认证身份隔离 |
 
 ```mermaid
-flowchart LR
-  Web[Next.js / AI Elements / shadcn] -->|同源代理与设备签名| API[FastAPI]
-  API --> Agent[LangChain create_agent]
-  Agent --> Skills[按需加载 Skill]
-  Agent --> RAG[文档检索 / 重排]
-  Agent --> Link[显式 Schema Linking]
-  Link --> SQL[校验 SQL / 只读执行]
-  RAG --> PG[(PostgreSQL / pgvector)]
+flowchart TD
+  Web[Next.js / AI Elements / shadcn] -->|同源请求与设备签名| API[FastAPI / 认证与任务提交]
+  API --> Queue[(PostgreSQL / PGMQ)]
+  Queue --> Worker[后台 Worker]
+  Worker --> Agent[LangChain create_agent]
+  Agent --> Skill[按需加载 Skill]
+  Agent --> RAG[向量检索 / 重排 / 原文引用]
+  Agent --> Link[目录 / 候选结构 / 显式 Schema Linking]
+  Link --> SQL[SQL AST 校验 / 只读执行]
+  RAG --> Vector[(pgvector 知识索引)]
   SQL --> Business[(食品电商业务表)]
-  API --> History[(身份 / 会话 / 运行快照)]
-  Agent --> UI[引用 / 图表 / 核对 / 澄清]
+  Agent --> Events[(会话 / 事件 / 结果快照)]
+  Events -->|SSE / 断线补读| Web
+  API --> Ingest[PDF / Markdown 上传任务]
+  Ingest --> Queue
+  Worker --> Parse[MinerU / 结构分块 / LangChain Document]
+  Parse --> Vector
 ```
+
+## 路由与冲突规则
+
+默认同时开放文档和业务查询工具，由单个 Agent 按问题选择 RAG、SQL 或组合取证；前端开关只限制能力，不要求用户手动选路。Skill 提供处理方法，工具校验来源、字段、权限和展示数据，不把预期答案传给模型。
+
+路由失败例：“生鲜品类退款率高，是因为政策太宽松还是数据异常？”模型可能只查政策或只查数据；时间、地区和“高”的基准不明确，两份来源齐全也不能直接证明因果。通过范围澄清、跨来源 SOP、显式 Schema Linking 和固定用例复查降低误路由，仍不能保证所有问题正确。完整取舍见 [DECISIONS 第1问](DECISIONS.md#1-哪种查询会使路由失败为什么没有做到完美)。
+
+同口径月报2%与 SQL 实算8%并列展示并标注冲突，不静默覆盖；缺验收时间说明无法判定，未定义指标先澄清，3/3 的100%必须提示样本不足。用户可查看文档条款、原文高亮、已链接表字段、SQL 与实际结果。
 
 ## 本地启动
 
-需要 Python 3.12–3.13、uv、Docker Compose、Node.js 22.18+ 和 pnpm 11。本地验证环境：Python 3.13、Node.js 26.8.1、pnpm 11.25.0。
+从仓库根目录执行。需要 Python 3.12–3.13、uv、Docker Compose；前端按已验证版本使用 Node.js 26.8.1、pnpm 11.25.0。Python 与前端依赖分别由 `uv.lock`、`pnpm-lock.yaml` 锁定。
 
 ```bash
 uv sync --directory apps/api --locked
@@ -91,6 +114,25 @@ pnpm --dir apps/web dev
 
 完整条件见 [验收用例](tests/acceptance/cases.json)。用例不代表全部已通过真实模型回归，当前证据见 [验证记录](docs/validation.md)。
 
+## 仓库结构
+
+```text
+apps/api/src/xiaoma/    FastAPI 服务与认证
+  agent/               Agent 最终组装、工具、Skill、SQL、持久化
+  ingestion/           MinerU、Markdown、结构切分与入库
+  debug_cli/           经正式认证调用的调试 CLI
+apps/api/tests/        后端单元与 PostgreSQL 集成测试
+apps/web/src/          正式页面、业务组件与 AI Elements
+apps/web/tests/        引用、事件回放、处理过程与切分演示回归
+skills/                内置 Skill 与参考资源
+data/                  中文合成业务表、PDF 与 Markdown
+tests/acceptance/      问题、预期答案和验收点
+deploy/                生产镜像、Compose 与 Nginx 示例
+docs/                  架构、运行、入库、测试和部署说明
+scripts/               初始化、数据导入、检查与源码打包
+DECISIONS.md           作业指定的三个设计问题
+```
+
 ## 检查与调试
 
 ```bash
@@ -123,4 +165,14 @@ sh scripts/xiaoma.sh inspect RUN_ID
 
 `apps/api` 为后端，`apps/web` 为正式前端，`skills` 为内置 SOP，`data` 为合成资料，`tests/acceptance` 为人工/真实模型验收用例。`docs/_planning/` 为被 Git 忽略的本地过程资料。
 
-尚未部署公网；未实现 Small-to-Big、混合检索、通用远程 MCP 和企业多租户平台。路由与口径判断仍有模型误判风险，取舍见 [DECISIONS.md](DECISIONS.md)。
+## 部署与源码交付
+
+已完成 Linux amd64 容器化 HTTPS 部署，并实测管理员登录、邀请绑定/隔离/撤销、RAG、SQL、HYBRID、PDF 原文高亮、SSE 和断连后后台执行。可复用的构建与初始化步骤见 [部署说明](docs/deployment.md)，不包含服务器凭据、证书或数据库快照。
+
+```bash
+make package
+```
+
+打包前检查仓库卫生，生成 `var/deliverables/xiaoma-assistant-source.zip`，仅包含 Git 跟踪的文件及逐文件 SHA-256 清单；存在未提交改动时拒绝打包。源码包不包含 `.git`、密钥、会话、向量快照、依赖和构建产物。解压后仍可执行仓库检查；首次运行会按上述步骤生成本机私有配置。
+
+未实现 Small-to-Big、混合检索、通用远程 MCP 和企业多租户平台；LangSmith 远端追踪、负载与消融评测未完成。路由与口径判断仍有模型误判风险，取舍见 [DECISIONS.md](DECISIONS.md)。
