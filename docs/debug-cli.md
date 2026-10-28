@@ -42,7 +42,7 @@ sh scripts/xiaoma.sh --json chat --input tests/prompt.txt --skill sql --no-knowl
 sh scripts/xiaoma.sh --json chat --input -
 ```
 
-默认流式回答写 stdout，进度和工具状态写 stderr。`--json` 时 stdout 只输出一个完整结果 JSON，便于脚本读取；进度仍在 stderr。成功收到完成事件退出码为 0；服务错误、断流或参数错误为 1；Ctrl+C 为 130。完成表示本次执行完成，不等于答案已经通过语义验收。失败时保留部分回答，不把半截输出当作成功。聊天由后台队列执行，断流或 CLI 退出不会隐式取消；Ctrl+C 会尝试发送停止请求，若网络不可达，应重新登录后用 `stop RUN_UUID` 确认停止。`inspect` 可以读取后台保存的进度和结果，不能以订阅结束判断任务成功。
+默认流式回答写 stdout，进度和工具状态写 stderr。`--json` 时 stdout 只输出一个完整结果 JSON，便于脚本读取；进度仍在 stderr。成功收到完成事件退出码为 0；服务错误、断流或参数错误为 1；Ctrl+C 为 130。完成事件对应本次运行的服务端终态。失败时保留部分回答，不把半截输出当作成功。聊天由后台队列执行，断流或 CLI 退出不会隐式取消；Ctrl+C 会尝试发送停止请求，若网络不可达，应重新登录后用 `stop RUN_UUID` 确认停止。`inspect` 可以读取后台保存的进度和结果，不能以订阅结束判断任务成功。
 
 每次发送保存一份 `var/debug-runs/北京时间-随机ID/`：
 
@@ -83,4 +83,4 @@ sh scripts/xiaoma.sh logout
 2. 一次只改一个层次，保留每次运行报告；核对实际工具顺序、SQL 口径、引用及事实，不能只比较文案是否流畅。
 3. 系统规则在 `apps/api/src/xiaoma/agent/skills.py`；最终组装、Todo/总结提示词在 `apps/api/src/xiaoma/agent/builder.py`；预算与重试在 `resilience.py` 和 `settings.py`。修改 Python 后重启 API。
 4. 内置 Skill 源码位于 `skills/*/SKILL.md`，数据库保存启用版本。单改磁盘文件不会覆盖已存在的数据库版本；通过 Agent 配置页上传标准 ZIP 更新版本，随后用 `skills` 和 `inspect` 核对本轮实际版本。
-5. 基线稳定后再增加成批回归及 LangSmith 评估。当前 CLI 不带未验证的自动判分，也不自动改提示词。
+5. 基线稳定后再增加成批回归及 LangSmith 评估。CLI 用于收集问题、工具与实际结果，供人工复查和提示词迭代。

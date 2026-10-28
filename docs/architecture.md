@@ -86,4 +86,4 @@ PostgreSQL 保存知识索引、身份/邀请、会话/运行；私有文件目�
 
 `/project` 的“证据核对”展示月报冲突、版本适用、缺失验收时间、小样本与指标澄清，并保留零分母样例。文档弹窗渲染仓库合成资料节选，SQL 弹窗展示独立只读查询的实测快照；可以查看字段与统计粒度。核对卡与澄清组件复用聊天渲染器，示例交互不调用模型、不发送聊天。
 
-`scripts/build_review_demo.py` 从正式 `SqlSession` 生成并核验五份只读查询快照。需要刷新时运行 `PYTHONPATH=apps/api/src uv run --project apps/api python scripts/build_review_demo.py`，需要已导入业务库；这不代表五个场景已通过完整真实模型回归。
+`scripts/build_review_demo.py` 从正式 `SqlSession` 生成并核验五份只读查询快照。需要刷新时运行 `PYTHONPATH=apps/api/src uv run --project apps/api python scripts/build_review_demo.py`，需要已导入业务库。

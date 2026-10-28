@@ -12,11 +12,11 @@ python3 scripts/check_repository.py
 
 后端检查 Ruff、格式和 Pytest。集成测试连接真实 PostgreSQL / pgvector，在随机 `test_*` Schema 中创建并清理测试状态；业务查询只读访问导入的合成业务表，不删除应用知识库或聊天。
 
-Embedding、MinerU、重排及部分模型采用受控 HTTP / 模型响应，用于检查请求契约、结构完整性、工具循环、权限、持久化和错误恢复，不用于衡量语义质量。SSE 有客户端在生成完成前必须收到首段的 TCP 测试。
+Embedding、MinerU、重排及部分模型采用受控 HTTP / 模型响应，检查请求契约、结构完整性、工具循环、权限、持久化和错误恢复。SSE 有客户端在生成完成前必须收到首段的 TCP 测试。
 
-前端检查 TypeScript、ESLint、5项引用 AST/Streamdown、6项后台事件回放及4项处理过程状态回归及 Next.js生产构建。`check_repository.py` 检查公开候选文件中的本机路径、常见密钥特征、禁止提交的产物、Markdown 相对链接和验收集覆盖；这是仓库卫生检查，不是完整安全审计。
+前端检查 TypeScript、ESLint、5项引用 AST/Streamdown、6项后台事件回放及4项处理过程状态回归及 Next.js生产构建。`check_repository.py` 检查公开候选文件中的本机路径、常见密钥特征、禁止提交的产物、Markdown 相对链接和验收集覆盖；用于检查源码交付内容。
 
-[CI](../.github/workflows/ci.yml) 使用独立 pgvector 服务与测试凭据导入合成数据，不需要真实模型密钥。本地通过不等于远端 CI 已执行，最新状态见 [验证记录](validation.md)。
+[CI](../.github/workflows/ci.yml) 使用独立 pgvector 服务与测试凭据导入合成数据，不需要真实模型密钥。提交对应的 CI 结果与本地记录见 [验证记录](validation.md)。
 
 ## 固定用例目录与页面
 
@@ -32,11 +32,11 @@ Embedding、MinerU、重排及部分模型采用受控 HTTP / 模型响应，用
 
 前端启动、类型检查和构建时，用 `apps/web/scripts/sync-test-cases.mjs` 从该目录生成被忽略的本地JSON。横向滚动入口与弹窗共用这份生成数据；点击先查看预期及验收点，再点“填入问题”，只填入question，不自动发送，也不向Agent附加预期答案或路由。
 
-日期固定为2026年9月；全量订单问题明确不限制日期。指标卡退款金额限定9月支付队列、完成早于10月1日，预期4,228元；按9月到账归月的4,264元是另一口径，不可混为同一个答案。折线图补齐30天，9月21日至30日支付订单为0。预期按仓库固定合成资料定义，不代表每题已经通过真实模型测试。
+日期固定为2026年9月；全量订单问题明确不限制日期。指标卡退款金额限定9月支付队列、完成早于10月1日，预期4,228元；按9月到账归月的4,264元是另一口径，不可混为同一个答案。折线图补齐30天，9月21日至30日支付订单为0。预期答案按仓库固定合成资料定义，真实模型运行结果另行记录。
 
 ## 真实模型验收
 
-输入与预期保存在 [cases.json](../tests/acceptance/cases.json)。它是可复查的验收清单，不会作为模型上下文或知识库文档，也没有把预期输出伪装成真实调用。
+输入与预期保存在 [cases.json](../tests/acceptance/cases.json)。页面与 CLI 仅发送问题，预期答案用于对照实际输出，不进入 Agent 上下文或知识库。
 
 准备：
 
@@ -53,7 +53,7 @@ sh scripts/xiaoma.sh chat '订单110有申请和到账时间，能否判断退�
 sh scripts/xiaoma.sh inspect RUN_ID
 ```
 
-默认一次 `chat` 创建新对话；多轮用例显式使用 `--thread`。运行产物在私有 `var/debug-runs/`，详见 [CLI](debug-cli.md)。完成事件只说明运行结束，不能作为答案通过判分。
+默认一次 `chat` 创建新对话；多轮用例显式使用 `--thread`。运行产物在私有 `var/debug-runs/`，详见 [CLI](debug-cli.md)。运行结束后逐项核对下方的依据、数值与结论。
 
 逐项检查：
 
@@ -66,9 +66,9 @@ sh scripts/xiaoma.sh inspect RUN_ID
 
 用例使用明确的2026年9月窗口，避免“上个月”随日期改变。页面预设问题中的相对日期按业务 `demo_context` 解释。
 
-## 效果评估边界
+## 效果评估方法
 
-单元测试通过、一次真实模型成功、引用 ID 有效和高重排分数是不同证据。当前没有成套 Recall@k、引用支持度、冲突判断准确率或路由准确率。后续按 [DECISIONS](../DECISIONS.md) 固定问题集做消融，先记录失败再调整提示词/Skill，避免边测边改而丢失基线。
+按 [DECISIONS](../DECISIONS.md) 固定语料、问题集和模型，记录检索命中、引用支持、路由选择、核对结论与调用成本。提示词和 Skill 的调整保留前后版本及对应运行记录，便于比较。
 
 后台任务测试还需先运行 `uv run --project apps/api python scripts/init_queue.py`。新增的并发、取消、权限、租约、重启和真实TCP断线测试见 [后台任务](background-jobs.md)。
 
@@ -80,6 +80,6 @@ sh scripts/xiaoma.sh inspect RUN_ID
 
 在已复查并提交的干净 Git 工作区执行 `make package`。脚本先检查密钥特征、禁止产物、文档链接与必需场景，再打包 Git 跟踪文件和 SHA-256 清单；未提交或打包过程中变化的源码会被拒绝，不把工作区未知文件混入交付包。
 
-解压源码包后运行 `python3 scripts/check_repository.py`，即使没有 `.git` 也会逐文件验证 `SUBMISSION_MANIFEST.json`；缺失或被修改的源码返回失败。该清单用于完整性核对，不代替代码签名或安全审计。`.env`、本地凭据、运行快照、依赖和构建产物不参与分发。
+解压源码包后运行 `python3 scripts/check_repository.py`，即使没有 `.git` 也会逐文件验证 `SUBMISSION_MANIFEST.json`；缺失或被修改的源码返回失败。该清单用于核对交付文件与提交版本的完整性。`.env`、本地凭据、运行快照、依赖和构建产物不参与分发。
 
 生产启动复查使用独立 Compose 项目与新 PostgreSQL 卷：初始化 PGMQ、导入业务数据、创建只读账号与管理员；重复初始化不追加数据或轮换凭据。随后检查匿名访问拒绝、管理员登录、业务目录与5,000条订单、前端代理和PDF.js资源。此项不消耗真实模型服务，也不接触现有知识库和会话。

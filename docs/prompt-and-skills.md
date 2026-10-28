@@ -58,6 +58,6 @@ Agent 使用 LangChain `create_agent`。系统提示词负责通用行为，Skil
 
 修改磁盘文件不会覆盖数据库中的现有 Skill。通过管理员标准 ZIP 上传接口发布新修订，保留原包、启停状态与运行快照；后续运行使用新版本，已启动运行固定原版本。
 
-验证分两部分：工具/权限/来源等可确定的约束使用自动测试；真实模型回答对照 [典型用例](../tests/acceptance/cases.json) 检查路由、口径、数值、原文支持和组件。单次模型运行完成不等于语义验收通过，性能对比也需说明样本量。
+验证分两部分：工具/权限/来源等可确定的约束使用自动测试；真实模型回答对照 [典型用例](../tests/acceptance/cases.json) 检查路由、口径、数值、原文支持和组件。检查项包括实际工具选择、引用依据、计算口径与结果卡内容；性能对比固定问题与样本量。
 
 参考：[LangChain Skills](https://docs.langchain.com/oss/python/langchain/multi-agent/skills)、[Tool 定义与 Schema](https://docs.langchain.com/oss/python/langchain/tools)、[Agent Skills 规范](https://agentskills.io/specification)。

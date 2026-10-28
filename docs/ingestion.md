@@ -21,7 +21,7 @@ Markdown 使用 markdown-it 解析标题、段落、表格、代码与行范围�
 | `parser` / `chunker_version` | 解析器与分块器版本 |
 | `content_hash` / `oversized_atom` | 内容摘要和超长完整单元标记 |
 
-同一索引内 ID 稳定。过期任务被接管时分配新的 `index_id`，防止旧执行过程覆盖新索引；不同执行尝试不承诺相同分块 ID。
+同一索引内 ID 稳定。过期任务被接管时分配新的 `index_id`，新尝试生成独立的分块 ID，防止旧执行过程覆盖新索引。
 
 PDF 保存 MinerU Content List V1 的原始 bbox，并标记其为左上原点的 0–1000 归一化坐标（与 layout.json 的 PDF 点坐标区分）。适配器校验页索引、有限数值、坐标边界和正面积；有效区域通过 source_refs 传到 PDF.js 覆盖层，随页宽与缩放同步定位高亮，点击原文区域可反向选中分块。缺少有效 bbox 的文档保留页级定位。表格、附注各自保留来源区域。Markdown 保留 1-based 行范围。正文使用统一 Markdown / HTML 表格渲染器，长块仅在显示层折叠，不截断入库或模型上下文。
 
@@ -44,17 +44,17 @@ queued → parsing → chunking → indexing → ready
 
 LangChain 当前版本逐条提交向量写入，整批不是一个事务。因此所有新向量先设 `active=false`。全部写入成功后，在同一个数据库事务中：校验当前执行权、保存规范分块、关闭旧索引、打开新索引、更新文档与任务状态。部分写入失败不进入检索，旧索引仍可用。
 
-每次尝试拥有独立索引 ID，发布前校验任务状态及当前索引 ID。取消、删除或租约接管后的旧执行不能发布。未发布向量与历史产物暂时保留供调试，尚未提供定期清理任务。删除为软删除，原文件不会立即物理擦除。
+每次尝试拥有独立索引 ID，发布前校验任务状态及当前索引 ID。取消、删除或租约接管后的旧执行不能发布。未发布向量与历史产物保留供调试和追溯。删除为软删除，原文件不会立即物理擦除。
 
 重处理可以更改结构分块长度；成功后分块启用状态初始化为启用，不自动继承旧版本的手工禁用。查看分块始终返回已发布版本；同时返回当前处理状态，避免把“重处理失败”误认为“旧数据已丢失”。
 
 ## 检索与观测
 
-检索用 LangChain Retriever，强制过滤 `active=true`、`enabled=true`。开启重排时先召回候选，再通过 LangChain `RunnableLambda` 调用百炼重排；重排只调整顺序并增加分数，不改写分块，不删除来源元数据。分数表示本次查询的相关性，不代表答案正确概率。
+检索用 LangChain Retriever，强制过滤 `active=true`、`enabled=true`。开启重排时先召回候选，再通过 LangChain `RunnableLambda` 调用百炼重排；重排只调整顺序并增加分数，不改写分块，不删除来源元数据。分数用于表示分块与本次查询的相关性。
 
 入库向量写入仅使用 `PGVectorStore.aadd_documents()`，应用不自行 INSERT 向量。应用事务只管理业务状态和发布过滤列。
 
-配置 `LANGSMITH_TRACING=true` 和 Key 后，记录入库处理链和安全错误，以及 Retriever / 重排运行。真实 LangSmith 远端追踪尚待配置验证；默认关闭，不影响本地处理。生成式回答与 ReAct Agent 已接入，运行与权限设计见 [Agent 与访问控制](agent-and-access.md)。
+配置 `LANGSMITH_TRACING=true` 和 Key 后，记录入库处理链和安全错误，以及 Retriever / 重排运行。追踪默认关闭，按服务端配置启用。生成式回答与 ReAct Agent 已接入，运行与权限设计见 [Agent 与访问控制](agent-and-access.md)。
 
 模型连接统一来自 `MODEL_BASE_URL`、`MODEL_API_KEY`，聊天、Embedding 与重排按模型名区分。百炼重排原生接口地址从同一网关 URL 推导；其他兼容服务不保证支持该接口，可关闭重排。
 
