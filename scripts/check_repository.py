@@ -88,9 +88,38 @@ def main() -> int:
         problems.append("acceptance: missing categories " + ", ".join(sorted(missing)))
     if len({case["id"] for case in cases}) != len(cases):
         problems.append("acceptance: duplicate IDs")
+    if len({case["question"] for case in cases}) != len(cases):
+        problems.append("acceptance: duplicate questions")
+    groups = acceptance.get("groups", [])
+    for group in groups:
+        size = sum(case.get("group") == group for case in cases)
+        if not 2 <= size <= 4:
+            problems.append(f"acceptance: {group} needs 2–4 representative cases")
+    components = {name for case in cases for name in case.get("components", [])}
+    required_components = {
+        "指标卡",
+        "柱状图",
+        "折线图",
+        "数据表",
+        "冲突核对卡",
+        "缺失核对卡",
+        "小样本核对卡",
+        "澄清选项卡",
+        "原文引用",
+    }
+    if required_components - components:
+        problems.append("acceptance: incomplete UI component coverage")
     for case in cases:
         if not case.get("question") or not case.get("checks"):
             problems.append(f"acceptance {case['id']}: empty question/checks")
+        if case.get("group") not in groups or not case.get("label"):
+            problems.append(f"acceptance {case['id']}: invalid group/label")
+        if (
+            not case.get("expected_answer")
+            or not case.get("reference")
+            or not case.get("components")
+        ):
+            problems.append(f"acceptance {case['id']}: missing review details")
         for name in case["required_documents"]:
             if not (ROOT / "data/examples" / name).is_file():
                 problems.append(f"acceptance {case['id']}: missing corpus {name}")

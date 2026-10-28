@@ -8,7 +8,7 @@ from uuid import UUID, uuid4
 
 import httpx
 from langsmith import traceable
-from sqlalchemy import and_, or_, select
+from sqlalchemy import and_, select, text
 
 from xiaoma.database import Database, utcnow
 from xiaoma.errors import IngestionError
@@ -74,6 +74,7 @@ class IngestionService:
                         status="queued",
                     )
                 )
+                await self.db.queue.send(conn, "ingestion", job_id)
         except BaseException:
             await asyncio.to_thread(path.unlink, missing_ok=True)
             raise
@@ -117,23 +118,43 @@ class IngestionService:
                     status="queued",
                 )
             )
+            await self.db.queue.send(conn, "ingestion", job_id)
         return {"document_id": document_id, "job_id": job_id, "status": "queued"}
+
+    async def migrate_queue(self):
+        """One-time bridge for jobs created before PGMQ was installed."""
+        async with self.db.engine.begin() as conn:
+            await conn.execute(
+                text("SELECT pg_advisory_xact_lock(hashtext(:name))"),
+                {"name": self.db.schema + ":ingestion-pgmq"},
+            )
+            await conn.execute(select(self.db.config).with_for_update())
+            done = await conn.scalar(
+                select(self.db.config.c.value).where(self.db.config.c.key == "pgmq_ingestion_v1")
+            )
+            if done:
+                return
+            rows = await conn.scalars(
+                select(self.db.jobs.c.id).where(self.db.jobs.c.status.in_(["queued", "running"]))
+            )
+            for job_id in rows:
+                await self.db.queue.send(conn, "ingestion", job_id)
+            await conn.execute(self.db.config.insert().values(key="pgmq_ingestion_v1", value=True))
 
     async def claim(self):
         j = self.db.jobs
+        message = await self.db.queue.reserve("ingestion")
+        if not message:
+            return None
         async with self.db.engine.begin() as conn:
             row = (
                 (
                     await conn.execute(
                         select(j)
                         .where(
-                            or_(
-                                j.c.status == "queued",
-                                and_(j.c.status == "running", j.c.lease_until < utcnow()),
-                            )
+                            j.c.id == UUID(message["message"]["id"]),
                         )
-                        .order_by(j.c.created_at)
-                        .with_for_update(skip_locked=True)
+                        .with_for_update()
                         .limit(1)
                     )
                 )
@@ -141,8 +162,16 @@ class IngestionService:
                 .first()
             )
             if row is None:
+                await self.db.queue.archive(conn, "ingestion", message["msg_id"])
                 return None
             job = dict(row)
+            if job["status"] not in {"queued", "running"}:
+                await self.db.queue.archive(conn, "ingestion", message["msg_id"])
+                return None
+            if job["status"] == "running" and job["lease_until"] > utcnow():
+                await self.db.queue.renew(conn, "ingestion", message["msg_id"])
+                return None
+            job["queue_message_id"] = message["msg_id"]
             # Every attempt has its own inactive index: an expired worker cannot alter a successor.
             job["index_id"] = uuid4()
             await conn.execute(
@@ -182,6 +211,7 @@ class IngestionService:
                 )
                 if not updated.rowcount:
                     return
+                await self.db.queue.renew(conn, "ingestion", job["queue_message_id"])
 
     async def stage(self, job, stage):
         async with self.db.engine.begin() as conn:
@@ -358,6 +388,17 @@ class IngestionService:
             beat.cancel()
             with contextlib.suppress(asyncio.CancelledError):
                 await beat
+            async with self.db.engine.begin() as conn:
+                # A superseded worker cannot acknowledge the successor's message.
+                finished = await conn.scalar(
+                    select(self.db.jobs.c.status)
+                    .where(
+                        self.db.jobs.c.id == job["id"], self.db.jobs.c.index_id == job["index_id"]
+                    )
+                    .with_for_update()
+                )
+                if finished in {"ready", "failed", "cancelled"}:
+                    await self.db.queue.archive(conn, "ingestion", job["queue_message_id"])
 
     async def run_once(self):
         job = await self.claim()

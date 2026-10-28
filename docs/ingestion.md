@@ -4,6 +4,8 @@
 
 PDF 使用 MinerU precision v4：申请上传地址、上传文件、轮询结果、下载结构化 ZIP。API Key 只发送到 MinerU API，不发送到上传和下载的签名地址。ZIP 不直接解压到文件系统，限制成员数量、总解压大小和结构化 JSON 大小。缺少结构化内容或表格正文时明确失败，不以纯 Markdown 代替并声称结构得到保留。
 
+MinerU 跨页合并可能将续页表格清空为占位。仅当 `layout.json` 显示续页正文因合并而删除，且其原始表格各行已完整出现在前页合并表中时，适配器才接收该占位，并将续页坐标并入完整表格来源。无法确认的空表仍明确失败；不会靠相邻位置猜测，也不从配套 Markdown 补写正文。
+
 Markdown 使用 markdown-it 解析标题、段落、表格、代码与行范围；额外识别独立 `$$` 公式。表格、公式后紧随的“注、说明、式中”等段落并入对应结构单元。结构分块器按完整单元分组，标题与后续正文优先同块；长度是组合目标，完整结构单元允许超长。
 
 最终每块转换为 `langchain_core.documents.Document`，转换后不再调用通用字符分块器。
@@ -38,7 +40,7 @@ queued → parsing → chunking → indexing → ready
                                   └──→ failed
 ```
 
-上传返回 202，任务存入 PostgreSQL，由应用后台 worker 领取。领取使用 `FOR UPDATE SKIP LOCKED`；心跳续租，进程退出后过期任务可被接管。HTTP 请求不等待 MinerU 完成长解析。
+上传返回 202，任务记录与 PGMQ 消息在同一事务写入 PostgreSQL。后台 Worker 先提交队列可见性预约，再锁定应用任务并分配执行索引 ID；心跳同步续租，进程退出后过期任务可被接管。API 与 Worker 可以分进程运行，HTTP 请求或浏览器断开不影响已入队任务。队列启动方式见 [后台任务](background-jobs.md)。
 
 LangChain 当前版本逐条提交向量写入，整批不是一个事务。因此所有新向量先设 `active=false`。全部写入成功后，在同一个数据库事务中：校验当前执行权、保存规范分块、关闭旧索引、打开新索引、更新文档与任务状态。部分写入失败不进入检索，旧索引仍可用。
 
@@ -55,3 +57,9 @@ LangChain 当前版本逐条提交向量写入，整批不是一个事务。因�
 配置 `LANGSMITH_TRACING=true` 和 Key 后，记录入库处理链和安全错误，以及 Retriever / 重排运行。真实 LangSmith 远端追踪尚待配置验证；默认关闭，不影响本地处理。生成式回答与 ReAct Agent 已接入，运行与权限设计见 [Agent 与访问控制](agent-and-access.md)。
 
 模型连接统一来自 `MODEL_BASE_URL`、`MODEL_API_KEY`，聊天、Embedding 与重排按模型名区分。百炼重排原生接口地址从同一网关 URL 推导；其他兼容服务不保证支持该接口，可关闭重排。
+
+## 项目介绍中的切块演示
+
+`/project` 的 RAG 页使用固定示例展示结构切块；参数在浏览器本地重算，不调用模型、不写入知识库。解析预览来自演示退款制度的真实 MinerU 产物，仅保存公开合成资料的正文与来源区域；模型名称与维度展示从后端默认配置生成，不包含连接地址或密钥。示例原子块由生产 Markdown 解析器生成，浏览器组合逻辑通过 Python 切割器的参考结果校验，包括标题边界、超长原子块与 Unicode 字符计数。
+
+修改解析器、切割器或示例后，运行 `PYTHONPATH=apps/api/src uv run --project apps/api python scripts/build_chunk_demo.py` 更新样本，再运行 `pnpm --dir apps/web test:chunking`。`make check` 会检查样本是否过期。

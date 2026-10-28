@@ -2,13 +2,15 @@
 
 ## 运行方式
 
-Agent 使用 LangChain `create_agent`，由 FastAPI 提供 `POST /api/v1/agent/serve` SSE 接口。LangGraph 是 LangChain 内部的循环运行时；会话与运行快照由本项目 PostgreSQL 保存。统一从 `scripts/dev.sh` 启动，以便认证覆盖全部业务入口。当前不会额外暴露原生 `/threads`、`/runs` 或未认证的图执行接口。
+Agent 使用 LangChain `create_agent`，由 FastAPI 的 `POST /api/v1/agent/runs` 接收后台任务，`GET /api/v1/agent/runs/{id}/events?after=N` 提供可补读 SSE。原 `POST /api/v1/agent/serve` 为提交并订阅的兼容入口。LangGraph 是 LangChain 内部的循环运行时；会话与运行快照由本项目 PostgreSQL 保存。统一从 `scripts/dev.sh` 启动，以便认证覆盖全部业务入口。当前不会额外暴露原生 `/threads`、`/runs` 或未认证的图执行接口。
 
 ```mermaid
 flowchart LR
     Browser[AI Elements 聊天 / 管理后台] --> Proof[HttpOnly Session + 浏览器签名]
     Proof --> API[FastAPI 访问控制]
-    API --> Agent[LangChain create_agent]
+    API --> Queue[(PGMQ / 固定请求 / 事件)]
+    Queue --> Worker[后台Worker]
+    Worker --> Agent[LangChain create_agent]
     Agent --> Skills[load_skill / read_skill_resource / 标准包]
     Agent --> RAG[知识库检索]
     Agent --> Link[目录 → 候选表 → link_schema]
@@ -52,13 +54,13 @@ flowchart LR
 
 执行前用 SQLGlot 校验单条 SELECT、CTE/别名及已选字段，拒绝写入、SELECT INTO、锁、外部表函数、系统 Schema、未链接表字段和任意函数调用。COUNT(*) 允许，普通 SELECT * 被拒绝。执行使用独立 SELECT-only 账号、只读事务、5 秒数据库超时和外层 201 行读取上限，展示最多 200 行；过大结果另外标记截断。执行失败会返回可恢复的工具错误，不伪造执行成功。
 
-查询结果与证据由服务产生 ID 并保存在所属回答中。模型仅选图表字段和展示意图，数值取实际结果。每条回答默认保留一份主结果视图，辅助 SQL 留在工具记录中。证据工具校验本轮结果与文档的归属；语义上的口径可比性仍需模型按 SOP 核对，不能将 Schema 通过或 `comparable=true` 当成确定性正确性证明。
+查询结果与证据由服务产生 ID 并保存在所属回答中。模型仅选图表字段和展示意图，数值取实际结果。每条回答默认保留一份主结果视图，辅助 SQL 留在工具记录中。页面先展示结果卡片，流式解释追加在下方；同一展示 ID 从加载到完成均保留首次出现的位置，实时更新与历史回放使用相同布局。证据工具校验本轮结果与文档的归属；语义上的口径可比性仍需模型按 SOP 核对，不能将 Schema 通过或 `comparable=true` 当成确定性正确性证明。
 
 ## 聊天引用
 
 知识库检索按本轮证据加入顺序分配引用编号，SSE 与历史消息保留累计来源目录。前端只用所属回答的目录解析 `[1]`、`[1][3]` 及完整原文链接；Markdown AST 转换保留表格结构，跳过代码、公式和已有链接，没有对应来源的编号保持普通文字。来源目录作为显式插件参数参与渲染缓存，避免同号引用串到其他回答。
 
-角标悬停或聚焦时加载片段并直接渲染 Markdown；点击在当前聊天内打开原文弹窗、定位并高亮对应区域。关闭后保留聊天与滚动位置。引用预览不伪造检索分数；加载失败、片段更新或移除会提示不可用，不替换成其他片段。
+角标悬停或聚焦时加载片段并直接渲染 Markdown；点击在当前聊天内打开原文弹窗、定位并高亮对应区域。关闭后保留聊天与滚动位置，焦点回到角标时不重开悬浮卡；再次悬停或键盘重新选中才显示预览。引用预览不伪造检索分数；加载失败、片段更新或移除会提示不可用，不替换成其他片段。
 
 ## 模型与参数
 
@@ -66,7 +68,7 @@ flowchart LR
 
 能力信息优先读取 LangChain `model.profile`。对当前大陆百炼网关，缺失的 Profile 可以从公开 models.dev 的 `alibaba-cn` 精确模型记录补齐，再传给 LangChain。不会从其他供应商的同名模型猜上限；公共资料不可达时保留未知字段，聊天仍可运行。公共能力声明与网关实际配额不同；主回答默认跟随 Profile 输出上限，并依据系统提示、消息和工具 Schema 占用动态预留空间。公开参数请求不携带模型 Key。
 
-一次运行固定模型；用户在下一次发送前可以切换。每轮限制递归步数及总运行时间，每个身份每分钟最多启动 20 次，同时最多两个运行。会话记在 PostgreSQL，使用原生 SummarizationMiddleware 总结较早消息，摘要和近期消息单独保存；完整页面历史保留，不删除原记录。
+一次运行固定模型；用户在下一次发送前可以切换。每轮限制递归步数及总运行时间，每个身份每分钟最多启动 20 次，默认每身份同时执行两个回答、最多十个待完成任务，其余排队；同一会话串行，不同会话可同时运行。会话记在 PostgreSQL，使用原生 SummarizationMiddleware 总结较早消息，摘要和近期消息单独保存；完整页面历史保留，不删除原记录。
 
 参考：[LangChain Models / Profiles](https://docs.langchain.com/oss/python/langchain/models)、[Skills pattern](https://docs.langchain.com/oss/python/langchain/multi-agent/skills)、[Middleware](https://docs.langchain.com/oss/python/langchain/middleware/built-in)、[models.dev](https://models.dev)。
 
@@ -78,7 +80,7 @@ flowchart LR
 - 首次兑换时绑定浏览器 P-256 公钥和独立访客 UUID。私钥以不可导出的 CryptoKey 保存到 IndexedDB。
 - 会话使用 HttpOnly / SameSite=Strict Cookie。每个业务请求还需用浏览器私钥签名方法、路径/查询、时间戳、单次 nonce 和请求体摘要；复制 Cookie 或只伪造设备 ID 不能通过验证。
 - 验证挑战和请求 nonce 单次使用且过期，登录/兑换有频率限制。过期挑战、nonce、限流记录和会话定期清理。
-- `valid_from <= now < expires_at` 才能兑换或继续访问。每次请求、每次工具调用及流式运行期间都会重新核验；撤销或到期会阻止后续请求并终止本地流式运行。
+- `valid_from <= now < expires_at` 才能兑换或继续访问。每次请求、每次工具调用及流式运行期间都会重新核验；撤销或到期会阻止后续请求并停止该身份的后台执行及后续输出。
 - 管理员可调整有效期、撤销、重置设备。换绑轮换邀请令牌并撤销旧登录，新设备建立新访客身份，不继承旧访客聊天。
 
 这里绑定的是浏览器环境，不是硬件身份认证。清理浏览器数据、换浏览器或换设备需要管理员重置；未使用的邀请由首次持有并兑换的人绑定。不能阻止已授权访客复制其已看到的内容。
@@ -111,14 +113,26 @@ SSE 使用 `Cache-Control: no-store, no-transform` 和 `X-Accel-Buffering: no`�
 
 配置入口为根目录 `.env`，完整字段与默认值见 `apps/api/src/xiaoma/settings.py` 和 `.env.example`。修改后重启 API。模型和密钥继续复用一套 URL / Key；`CHAT_TEMPERATURE` 默认不传，遵循模型服务默认；没有强行覆盖不同模型的推理开关或 top_p。
 
+## 后台运行
+
+聊天与解析分别使用 PGMQ；关闭页面、刷新和切换会话不会取消任务。事件按运行序号持久化，前端恢复快照后补读缺失片段。显式停止跨进程撤销执行权；聊天进程异常不自动重放整个回答。部署、并发及恢复边界见 [后台任务](background-jobs.md)。
+
 ## 故障恢复与运行状态
 
 `agent/resilience.py` 组合 LangChain 原生 `ModelRetryMiddleware`、`ToolRetryMiddleware`，增加选择性重试和流式保护。每次最多额外重试 2 次，1 秒起步、指数退避、±25% 抖动、单次等待上限 4 秒；仍受 900 秒总超时约束。只处理临时连接、超时、408/429/5xx、数据库连接失效或瞬时事务故障。鉴权、参数、SQL 语法、Schema Linking 错误不重复执行，由受控错误消息让模型修正。只对检索和只读查询工具自动重试，展示类工具不重放。同工具同参数连续失败三次停止循环，保留已有结果。
 
 聊天 SDK 重试为 0，检索用 Embedding 的 SDK 重试也为 0，避免和工具中间件相乘；独立文档入库仍保留原有 Embedding SDK 两次重试。摘要使用自定义 summarizer 包装相同的有界瞬时故障重试，绕过原生摘要器的额外默认重试；失败不会把空摘要写入历史。标题链最多 3 次尝试且总共不超过 8 秒，失败保留原标题。
 
-如果当前模型调用已经吐出文字或工具参数片段，自动模型重试停止，保留部分输出并报错，避免重复拼接。工具重试耗尽后向模型返回脱敏错误，不能把失败包装成查询成功；权限错误仍立即终止。停止、超时和异常会释放运行租约，保存部分回答，并把未完成工具标为失败。
+如果当前模型调用已经吐出正文、模型返回的思考内容或工具参数片段，自动模型重试停止，保留部分输出并报错，避免重复拼接。工具重试耗尽后向模型返回脱敏错误，不能把失败包装成查询成功；权限错误仍立即终止。停止、超时和异常会释放运行租约，保存部分回答，并把未完成工具标为失败。
 
-产品状态使用“小马开工啦，先理理思路”等轻快文案，展示实际工具阶段；不以有无前置文字覆盖后续查询状态。开场状态每轮只发送一次，后续模型调用在已有工具结果时切换为“正在核对结果，继续处理”。前端只有一行当前状态，不再重复显示等待正文或模拟步骤；有实际工具调用后才提供可展开的处理过程，默认折叠，展开只展示工具记录。纯文本回答开始输出后隐藏等待状态。完整参数与技能修订在每次运行快照中保存。底部任务条继续显示原生 write_todos 状态、默认折叠。
+前端把模型返回的思考内容与工具调用合为一个“处理过程”，顶部只显示当前阶段。新记录按真实开始时间交错排列；缺少工具时间戳的旧记录保留原有分组，不补造时序。模型未返回思考内容时，不生成模拟思考文本。完整参数与技能修订在每次运行快照中保存。
+
+展开策略：
+
+- 运行中自动展示当前思考及工具步骤；每段思考结束即自动收起正文，包括运行中曾手动展开的情况，结束后可再次点击查看。工具参数默认收起；开始输出正文或成功结束后，自动收起整个处理过程。
+- 运行失败自动展示详情及失败工具；用户主动停止后收起，保留部分输出供查看。历史成功记录默认收起。
+- 运行中手动展开或收起不被后续 Token 和工具阶段覆盖；成功结束或主动停止时统一收起，失败时展示详情。结束后仍可手动展开；运行中和结束后的选择分别保存，在当前登录工作区内切换页面或会话仍保留。
+- 自动模式跟随最新步骤；手动查看详情或向上滚动阅读时停止追随。思考正文限制高度，长内容在区域内滚动。
+- 普通聊天没有实际思考或工具记录时只显示等待行，正文开始后隐藏，不出现空折叠入口。底部任务条继续独立显示原生 write_todos 状态，默认折叠。
 
 参考：[LangChain 官方中间件](https://docs.langchain.com/oss/python/langchain/middleware/built-in)、[官方 Deep Agents 总结实现](https://github.com/langchain-ai/deepagents/blob/main/libs/deepagents/deepagents/middleware/summarization.py)。参考其预算与上下文管理思路，项目继续使用 LangChain `create_agent`。

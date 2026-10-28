@@ -13,7 +13,27 @@ from langchain_core.utils.function_calling import convert_to_openai_tool
 from openai import APIConnectionError, APIStatusError
 from sqlalchemy.exc import DBAPIError
 
+from .compatible_model import reasoning_text
+
 READ_TOOLS = ["search_knowledge", "list_tables", "get_table_schema", "execute_readonly_sql"]
+
+
+class GreetingLatencyMiddleware(AgentMiddleware):
+    """Keep ordinary tool/analysis calls unchanged; speed up exact greetings only."""
+
+    def __init__(self, question):
+        from .model_behavior import is_greeting
+
+        self.greeting = is_greeting(question)
+
+    async def awrap_model_call(self, request, handler):
+        from .model_behavior import plain_response_settings
+
+        if self.greeting:
+            overrides = plain_response_settings(request.model)
+            if overrides:
+                request = request.override(model_settings={**request.model_settings, **overrides})
+        return await handler(request)
 
 
 class RepeatedToolFailure(Exception):
@@ -131,7 +151,9 @@ class StreamGuard(AsyncCallbackHandler):
 
     async def on_llm_new_token(self, token, *, chunk=None, **kwargs):
         message = getattr(chunk, "message", None)
-        if token or (message and (message.content or message.tool_call_chunks)):
+        if token or (
+            message and (message.content or message.tool_call_chunks or reasoning_text(message))
+        ):
             self.emitted = True
 
 

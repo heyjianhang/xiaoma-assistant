@@ -39,6 +39,13 @@ class FlakyStream(BaseChatModel):
         self._calls.append(True)
         if self.mode == "invalid":
             raise ValueError("invalid model request")
+        if self.mode == "reasoning":
+            yield ChatGenerationChunk(
+                message=AIMessageChunk(
+                    content="", additional_kwargs={"reasoning_content": "已展示的思考"}
+                )
+            )
+            raise ConnectionError("reasoning stream disconnected")
         if self.mode == "partial":
             yield ChatGenerationChunk(message=AIMessageChunk(content="保留这段"))
             raise ConnectionError("stream disconnected")
@@ -54,6 +61,7 @@ class FlakyStream(BaseChatModel):
         ("always", 3, ""),
         ("invalid", 1, ""),
         ("partial", 1, "保留这段"),
+        ("reasoning", 1, ""),
     ],
 )
 async def test_real_stream_retries_before_output_only(provider_settings, mode, attempts, expected):

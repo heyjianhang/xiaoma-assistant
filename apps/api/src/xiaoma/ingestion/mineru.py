@@ -14,6 +14,7 @@ from xiaoma.errors import IngestionError
 from xiaoma.settings import Settings
 
 from .markdown import attach_notes
+from .mineru_tables import merged_table_continuations
 from .types import ParsedDocument, SourceBlock
 
 
@@ -23,8 +24,11 @@ def strings(value) -> str:
     return str(value or "")
 
 
-def normalize_content(items: list[dict], task_id: str) -> ParsedDocument:
-    blocks = []
+def normalize_content(
+    items: list[dict], task_id: str, continuations: dict[int, int] | None = None
+) -> ParsedDocument:
+    blocks, tables = [], {}
+    continuations = continuations or {}
     pages = 0
     for number, item in enumerate(items):
         kind = item.get("type", "text")
@@ -59,6 +63,11 @@ def normalize_content(items: list[dict], task_id: str) -> ParsedDocument:
                 ref["coordinate_space"] = "normalized_1000"
             else:
                 ref["coordinate_space"] = "unavailable"
+        if number in continuations and kind == "table":
+            parent = tables.get(continuations[number])
+            if parent is not None:
+                parent.source_refs.append({**ref, "merged_table_parent": parent.id})
+                continue
         level = 0
         if kind == "table":
             body = strings(item.get("table_body"))
@@ -100,6 +109,8 @@ def normalize_content(items: list[dict], task_id: str) -> ParsedDocument:
                     source_refs=[ref],
                 )
             )
+            if kind == "table":
+                tables[number] = blocks[-1]
     return ParsedDocument(
         parser="mineru-v4-content-list-v1",
         blocks=attach_notes(blocks),
@@ -135,7 +146,14 @@ def parse_archive(data: bytes, task_id: str) -> ParsedDocument:
             content = json.loads(archive.read(item))
             if not isinstance(content, list) or not all(isinstance(row, dict) for row in content):
                 raise IngestionError("mineru_schema_unsupported", "MinerU 结构化内容格式不兼容")
-            return normalize_content(content, task_id)
+            continuations = {}
+            if any(row.get("type") == "table" and not row.get("table_body") for row in content):
+                layouts = [m for m in members if PurePosixPath(m.filename).name == "layout.json"]
+                if len(layouts) == 1 and layouts[0].file_size <= 32 * 1024**2:
+                    layout = json.loads(archive.read(layouts[0]))
+                    if isinstance(layout, dict):
+                        continuations = merged_table_continuations(content, layout)
+            return normalize_content(content, task_id, continuations)
     except (zipfile.BadZipFile, json.JSONDecodeError, UnicodeDecodeError, RuntimeError) as exc:
         raise IngestionError("mineru_archive_invalid", "MinerU 返回的解析压缩包无效") from exc
 

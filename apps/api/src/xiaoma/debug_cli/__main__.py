@@ -100,9 +100,14 @@ def capture(client, args):
             elif event["type"] == "tool":
                 tool = event["tool"]
                 print(terminal_text(f"[{tool['state']}] {tool['name']}"), file=sys.stderr)
-            if event["type"] in {"complete", "error"}:
+            if event["type"] in {"complete", "error", "stopped"}:
                 break
     except KeyboardInterrupt:
+        if report.result["run_id"]:
+            try:
+                client.request("POST", f"/api/v1/agent/runs/{report.result['run_id']}/stop")
+            except (CliError, httpx.HTTPError):
+                pass
         report.result.update(status="stopped", error="客户端已中断，部分输出保留")
     except (CliError, httpx.HTTPError, ValueError) as exc:
         detail = str(exc) if isinstance(exc, CliError) else "连接或事件解析失败；未自动重发问题"
@@ -157,6 +162,8 @@ def parser():
     chat.add_argument("--skill", action="append", default=[])
     chat.add_argument("--knowledge", action=argparse.BooleanOptionalAction, default=True)
     chat.add_argument("--data", action=argparse.BooleanOptionalAction, default=True)
+    stop_run = sub.add_parser("stop", help="Cancel a background run owned by this identity")
+    stop_run.add_argument("id", type=UUID)
     inspect = sub.add_parser("inspect", help="查看本身份某次运行的服务端快照与完整结果")
     inspect.add_argument("id", type=UUID)
     threads = sub.add_parser("threads").add_subparsers(dest="action", required=True)
@@ -210,6 +217,8 @@ def main(argv=None):
                 else:
                     result = client.request("POST", f"/api/v1/conversations/{args.id}/restore")
                 print_json(result)
+        elif args.command == "stop":
+            print_json(client.request("POST", f"/api/v1/agent/runs/{args.id}/stop"))
         elif args.command == "inspect":
             print_json(client.request("GET", f"/api/v1/admin/debug/runs/{args.id}"))
         elif args.command == "logout":

@@ -87,6 +87,7 @@ async def api(provider_settings):
                 yield client, app.state.ingestion, db
     finally:
         if db:
+            await db.queue.drop_test_queues()
             # Only a fresh randomly named test schema; never the application's knowledge schema.
             assert db.schema.startswith("test_") and len(db.schema) == 37
             async with db.engine.begin() as conn:

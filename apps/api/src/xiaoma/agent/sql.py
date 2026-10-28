@@ -98,8 +98,12 @@ def validate_sql(sql, context, schema):
             allow_partial_qualification=False,
             validate_qualify_columns=True,
         )
-    except Exception as exc:
-        raise ValueError("SQL字段未链接或存在歧义，请重新检查选表选字段") from exc
+    except sqlglot.errors.OptimizeError as exc:
+        # Parser diagnostics only contain this submitted query and linked schema.
+        # Returning the unresolved column lets the model repair the right link.
+        raise ValueError(
+            "SQL字段未链接或存在歧义，请补看结构并重新link_schema，或修正列限定：" + str(exc)[:300]
+        ) from exc
     return tree.sql(dialect="postgres")
 
 

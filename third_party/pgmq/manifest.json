@@ -1,0 +1,14 @@
+{
+  "version": "v1.13.0",
+  "repository": "https://github.com/pgmq/pgmq",
+  "files": {
+    "pgmq.sql": {
+      "url": "https://raw.githubusercontent.com/pgmq/pgmq/v1.13.0/pgmq-extension/sql/pgmq.sql",
+      "sha256": "bf7e66c75ed771df0c5f7cb2b9f0123ca77992daacd56e3911d1894a3efa99de"
+    },
+    "LICENSE": {
+      "url": "https://raw.githubusercontent.com/pgmq/pgmq/v1.13.0/LICENSE",
+      "sha256": "a3ce61e0031bdcad1024b1bf50ded2359602160f00e0cac8e509752273df6179"
+    }
+  }
+}

@@ -24,3 +24,4 @@ coverage/
 dist/
 build/
 *.egg-info/
+apps/web/src/generated/test-cases.json

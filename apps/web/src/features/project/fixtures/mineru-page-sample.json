@@ -1,0 +1,105 @@
+{
+  "source": "refund-policy-v2.pdf",
+  "title": "售后退款制度（新版）",
+  "parser": "mineru-v4-content-list-v1",
+  "total_pages": 5,
+  "page": 2,
+  "blocks": [
+    {
+      "id": "mineru:14",
+      "kind": "heading",
+      "markdown": "## 3 材料验收与到账时限",
+      "level": 2,
+      "source_refs": [
+        {
+          "kind": "mineru_content",
+          "block_index": 14,
+          "page_index": 1,
+          "bbox_raw": [
+            75,
+            91,
+            300,
+            110
+          ],
+          "bbox": [
+            75,
+            91,
+            300,
+            110
+          ],
+          "coordinate_space": "normalized_1000"
+        }
+      ]
+    },
+    {
+      "id": "mineru:15",
+      "kind": "text",
+      "markdown": "AS2-3.1 accepted\\_at 为售后确认退货实物与材料完整、验收通过的业务时刻；仅退款场景为证据材料验收通过时刻。applied\\_at 为申请提交时刻，completed\\_at 为原支付渠道确认退款成功时刻。三者含义不同。",
+      "level": 0,
+      "source_refs": [
+        {
+          "kind": "mineru_content",
+          "block_index": 15,
+          "page_index": 1,
+          "bbox_raw": [
+            73,
+            124,
+            914,
+            164
+          ],
+          "bbox": [
+            73,
+            124,
+            914,
+            164
+          ],
+          "coordinate_space": "normalized_1000"
+        }
+      ]
+    },
+    {
+      "id": "mineru:16",
+      "kind": "table",
+      "markdown": "表AS2-T2 支付渠道退款到账时效\n\n<table><tr><td>原支付渠道</td><td>验收后最长期限</td><td>责任与计时说明</td></tr><tr><td>电子钱包 wallet</td><td>24自然小时</td><td>从验收通过到支付渠道成功到账连续计时。客服核验渠道回执,财务处理在途差错。</td></tr><tr><td>银行卡 bank</td><td>48自然小时</td><td>原路退回原支付账户;银行处理中仍纳入计时,异常应升级并保留回执。</td></tr></table>\n\n注1：到达期限的同一时刻完成视为按时，只有实际耗时大于期限才判定超时。注2：缺少验收时间或成功到账时间，不能用其他业务时间补算已完成退款时长。",
+      "level": 0,
+      "source_refs": [
+        {
+          "kind": "mineru_content",
+          "block_index": 16,
+          "page_index": 1,
+          "bbox_raw": [
+            78,
+            203,
+            917,
+            340
+          ],
+          "bbox": [
+            78,
+            203,
+            917,
+            340
+          ],
+          "coordinate_space": "normalized_1000"
+        },
+        {
+          "kind": "mineru_content",
+          "block_index": 17,
+          "page_index": 1,
+          "bbox_raw": [
+            75,
+            347,
+            909,
+            380
+          ],
+          "bbox": [
+            75,
+            347,
+            909,
+            380
+          ],
+          "coordinate_space": "normalized_1000"
+        }
+      ]
+    }
+  ]
+}

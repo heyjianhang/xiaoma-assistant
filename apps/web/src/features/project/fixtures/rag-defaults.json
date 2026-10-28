@@ -1,0 +1,11 @@
+{
+  "mineru_model_version": "vlm",
+  "embedding_model": "qwen3.7-text-embedding",
+  "embedding_dimensions": 1024,
+  "embedding_batch_size": 10,
+  "rerank_model": "qwen3.7-text-rerank",
+  "retrieval_candidates": 20,
+  "chunk_min_chars": 300,
+  "chunk_target_chars": 1000,
+  "chunk_max_chars": 1600
+}

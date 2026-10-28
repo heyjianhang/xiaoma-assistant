@@ -3,12 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node scripts/sync-pdfjs.mjs && next dev --hostname 127.0.0.1 --port 3002",
-    "build": "node scripts/sync-pdfjs.mjs && next build",
+    "dev": "node scripts/sync-test-cases.mjs && node scripts/sync-pdfjs.mjs && next dev --hostname 127.0.0.1 --port 3002",
+    "build": "node scripts/sync-test-cases.mjs && node scripts/sync-pdfjs.mjs && next build",
     "start": "next start",
     "lint": "eslint",
     "test:citations": "node --test tests/citation-links.test.mjs",
-    "typecheck": "next typegen && tsc --noEmit"
+    "test:runs": "node --test tests/run-events.test.mjs tests/process-view.test.mjs",
+    "typecheck": "node scripts/sync-test-cases.mjs && next typegen && tsc --noEmit",
+    "test:chunking": "node --test tests/chunk-demo.test.mjs"
   },
   "dependencies": {
     "@fontsource-variable/geist": "5.3.0",
@@ -23,6 +25,7 @@
     "cn": "0.5.0",
     "katex": "0.16.47",
     "lucide-react": "1.61.0",
+    "motion": "^14.6.0",
     "nanoid": "6.0.2",
     "next": "16.4.3",
     "next-themes": "0.4.6",

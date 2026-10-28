@@ -100,3 +100,93 @@ def test_normalized_source_regions_are_preserved_and_invalid_boxes_disabled():
         invalid = parse_archive(archive_bytes([dict(items[0], bbox=bbox)]), "task")
         assert not invalid.source_map_available
         assert "bbox" not in invalid.blocks[0].source_refs[0]
+
+
+def merged_table_archive(*, deleted=True, continuation="第二项", bbox=None):
+    header = "<tr><td>编号</td><td>材料</td></tr>"
+    first = "<tr><td>01</td><td>第一项</td></tr>"
+    second = f"<tr><td>02</td><td>{continuation}</td></tr>"
+    full = f"<table>{header}{first}<tr><td>02</td><td>第二项</td></tr></table>"
+    table_box = [10, 10, 90, 90]
+    items = [
+        {"type": "table", "table_body": full, "page_idx": 0, "bbox": [100, 100, 900, 900]},
+        {
+            "type": "table",
+            "table_body": "",
+            "img_path": "",
+            "page_idx": 1,
+            "bbox": bbox or [100, 100, 900, 900],
+        },
+    ]
+    layout = {
+        "pdf_info": [
+            {
+                "page_idx": 1,
+                "page_size": [100, 100],
+                "preproc_blocks": [
+                    {
+                        "type": "table",
+                        "bbox": table_box,
+                        "blocks": [
+                            {
+                                "type": "table_body",
+                                "lines": [
+                                    {
+                                        "spans": [
+                                            {
+                                                "type": "table",
+                                                "html": f"<table>{header}{second}</table>",
+                                            }
+                                        ]
+                                    }
+                                ],
+                            }
+                        ],
+                    }
+                ],
+                "para_blocks": [
+                    {
+                        "type": "table",
+                        "bbox": table_box,
+                        "blocks": [
+                            {
+                                "type": "table_body",
+                                "lines": [],
+                                "lines_deleted": deleted,
+                            }
+                        ],
+                    }
+                ],
+            }
+        ]
+    }
+    stream = io.BytesIO()
+    with zipfile.ZipFile(stream, "w") as archive:
+        archive.writestr("result/document_content_list.json", json.dumps(items))
+        archive.writestr("result/layout.json", json.dumps(layout))
+    return stream.getvalue()
+
+
+def test_confirmed_merged_table_keeps_full_content_and_both_page_regions():
+    parsed = parse_archive(merged_table_archive(), "task")
+    assert len(parsed.blocks) == 1
+    table = parsed.blocks[0]
+    assert table.markdown.count("第二项") == 1
+    assert "第一项" in table.markdown
+    assert [ref["page_index"] for ref in table.source_refs] == [0, 1]
+    assert table.source_refs[1]["bbox"] == [100, 100, 900, 900]
+    assert table.source_refs[1]["merged_table_parent"] == table.id
+    assert parsed.pages == 2 and parsed.source_map_available
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"deleted": False},
+        {"continuation": "不在合并正文里的第三项"},
+        {"bbox": [500, 500, 600, 600]},
+    ],
+)
+def test_unconfirmed_empty_table_is_not_silently_discarded(kwargs):
+    with pytest.raises(IngestionError, match="表格缺少"):
+        parse_archive(merged_table_archive(**kwargs), "task")

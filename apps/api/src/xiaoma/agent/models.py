@@ -7,8 +7,8 @@ from urllib.parse import urlparse
 
 import httpx
 from fastapi import HTTPException
-from langchain.chat_models import init_chat_model
 
+from .compatible_model import GatewayChatOpenAI
 from .resilience import output_limit
 
 PROFILE_FIELDS = (
@@ -31,7 +31,6 @@ class ModelCatalog:
 
     def model(self, name, profile=None):
         kwargs = {
-            "model_provider": "openai",
             "base_url": self.settings.model_base_url,
             "api_key": self.settings.model_api_key.get_secret_value(),
             "timeout": self.settings.chat_model_timeout_seconds,
@@ -46,7 +45,7 @@ class ModelCatalog:
             kwargs["temperature"] = self.settings.chat_temperature
         if profile:
             kwargs["profile"] = profile
-        return init_chat_model(name, **kwargs)
+        return GatewayChatOpenAI(model=name, **kwargs)
 
     async def registry_profiles(self):
         if self.public_profiles is not None:

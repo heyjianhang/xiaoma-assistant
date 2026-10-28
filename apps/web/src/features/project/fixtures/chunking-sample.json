@@ -1,0 +1,204 @@
+{
+  "chunker_version": "structure-v1",
+  "id": "refund",
+  "title": "退款制度节选",
+  "blocks": [
+    {
+      "id": "md:0:1",
+      "kind": "heading",
+      "markdown": "# 售后退款处理说明",
+      "level": 1,
+      "source_refs": [
+        {
+          "kind": "markdown_lines",
+          "line_start": 1,
+          "line_end": 1
+        }
+      ]
+    },
+    {
+      "id": "md:2:3",
+      "kind": "text",
+      "markdown": "以下为切块演示节选，围绕材料验收、渠道到账和异常核对组织内容。表格和公式后面的附注属于解释口径，检索时应保留完整。",
+      "level": 0,
+      "source_refs": [
+        {
+          "kind": "markdown_lines",
+          "line_start": 3,
+          "line_end": 3
+        }
+      ]
+    },
+    {
+      "id": "md:4:5",
+      "kind": "heading",
+      "markdown": "## 1 申请与验收",
+      "level": 2,
+      "source_refs": [
+        {
+          "kind": "markdown_lines",
+          "line_start": 5,
+          "line_end": 5
+        }
+      ]
+    },
+    {
+      "id": "md:6:7",
+      "kind": "text",
+      "markdown": "退款申请提交后，客服核对原购买明细、支付渠道与申请数量。仅退款场景核验照片和签收凭证；退货退款场景还需要核对实物、包装与仓库交接记录。",
+      "level": 0,
+      "source_refs": [
+        {
+          "kind": "markdown_lines",
+          "line_start": 7,
+          "line_end": 7
+        }
+      ]
+    },
+    {
+      "id": "md:8:9",
+      "kind": "text",
+      "markdown": "验收时间记录材料完整并审核通过的业务时刻。申请提交、商品发货和客户签收分别代表不同事件，不能替代售后验收时间。",
+      "level": 0,
+      "source_refs": [
+        {
+          "kind": "markdown_lines",
+          "line_start": 9,
+          "line_end": 9
+        }
+      ]
+    },
+    {
+      "id": "md:10:11",
+      "kind": "heading",
+      "markdown": "## 2 支付渠道到账时限",
+      "level": 2,
+      "source_refs": [
+        {
+          "kind": "markdown_lines",
+          "line_start": 11,
+          "line_end": 11
+        }
+      ]
+    },
+    {
+      "id": "md:12:13",
+      "kind": "text",
+      "markdown": "以下时限适用于新版制度受理的退款申请，从验收通过后开始连续计时。",
+      "level": 0,
+      "source_refs": [
+        {
+          "kind": "markdown_lines",
+          "line_start": 13,
+          "line_end": 13
+        }
+      ]
+    },
+    {
+      "id": "md:14:18",
+      "kind": "table",
+      "markdown": "| 原支付渠道 | 验收后最长期限 | 责任与计时说明 |\n| --- | --- | --- |\n| 电子钱包 wallet | 24 自然小时 | 从售后验收通过到支付渠道确认成功到账连续计时，周末与节假日不顺延。客服核验渠道回执，财务跟踪在途差错。 |\n| 银行卡 bank | 48 自然小时 | 原路退回原支付账户；银行处理期间仍然纳入到账时长，超过期限时应升级处理，并保留银行回执及沟通记录。 |\n\n注1：到达期限的同一时刻完成视为按时，只有实际耗时大于期限才判定超时。表格中的时限不包含申请后等待受理、补充材料和验收前的等待阶段。\n\n注2：缺少验收时间或成功到账时间时，不能用申请、发货、签收或更新时间补算已完成退款时长。应保留原记录并登记补录责任人。",
+      "level": 0,
+      "source_refs": [
+        {
+          "kind": "markdown_lines",
+          "line_start": 15,
+          "line_end": 18
+        },
+        {
+          "kind": "markdown_lines",
+          "line_start": 20,
+          "line_end": 20
+        },
+        {
+          "kind": "markdown_lines",
+          "line_start": 22,
+          "line_end": 22
+        }
+      ]
+    },
+    {
+      "id": "md:23:24",
+      "kind": "heading",
+      "markdown": "## 3 到账时长计算",
+      "level": 2,
+      "source_refs": [
+        {
+          "kind": "markdown_lines",
+          "line_start": 24,
+          "line_end": 24
+        }
+      ]
+    },
+    {
+      "id": "md:25:26",
+      "kind": "text",
+      "markdown": "到账时长统一换算成自然小时，比较时保留原始时间精度。",
+      "level": 0,
+      "source_refs": [
+        {
+          "kind": "markdown_lines",
+          "line_start": 26,
+          "line_end": 26
+        }
+      ]
+    },
+    {
+      "id": "md:27:30",
+      "kind": "equation",
+      "markdown": "$$\nH = \\frac{T_{\\mathrm{completed}} - T_{\\mathrm{accepted}}}{3600}\n$$\n\n式中，两个时间变量使用秒级时间戳，H 为自然小时数；T_completed 对应支付渠道确认成功到账的时刻，T_accepted 对应售后验收通过的时刻。H 大于适用渠道上限判为超时，等于上限判为按时。",
+      "level": 0,
+      "source_refs": [
+        {
+          "kind": "markdown_lines",
+          "line_start": 28,
+          "line_end": 30
+        },
+        {
+          "kind": "markdown_lines",
+          "line_start": 32,
+          "line_end": 32
+        }
+      ]
+    },
+    {
+      "id": "md:33:34",
+      "kind": "heading",
+      "markdown": "## 4 异常核对",
+      "level": 2,
+      "source_refs": [
+        {
+          "kind": "markdown_lines",
+          "line_start": 34,
+          "line_end": 34
+        }
+      ]
+    },
+    {
+      "id": "md:35:36",
+      "kind": "text",
+      "markdown": "成功退款记录缺少验收时间时，应标记“无法判定”，不能只根据申请到完成相隔的天数判断违规。",
+      "level": 0,
+      "source_refs": [
+        {
+          "kind": "markdown_lines",
+          "line_start": 36,
+          "line_end": 36
+        }
+      ]
+    },
+    {
+      "id": "md:37:38",
+      "kind": "text",
+      "markdown": "同一订单可能多次部分退款。统计退款订单率时按订单去重；统计退款单数量和退款金额时使用对应的退款记录，避免因关联明细重复累计。",
+      "level": 0,
+      "source_refs": [
+        {
+          "kind": "markdown_lines",
+          "line_start": 38,
+          "line_end": 38
+        }
+      ]
+    }
+  ]
+}

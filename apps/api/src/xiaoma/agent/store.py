@@ -21,7 +21,20 @@ from sqlalchemy.dialects.postgresql import JSONB, UUID, insert
 
 from ..database import utcnow
 from ..settings import ROOT
+from ..task_queue import RunLeaseLost
 from .skill_packages import make_package, package_from_legacy, safe_path
+
+
+def history_message(payload):
+    content = payload.get("content", "")
+    if payload["role"] == "assistant" and payload.get("status") in {
+        "stopped",
+        "interrupted",
+        "error",
+    }:
+        note = "[该轮已停止或失败；已有内容仅为部分结果，不是待办。用户未明确要求继续前不要恢复。]"
+        content = str(content) + "\n" + note
+    return {"role": payload["role"], "content": content} if content else None
 
 
 class AgentStore:
@@ -438,12 +451,10 @@ class AgentStore:
                     )
                 ).all()
                 payloads = []
-                for payload, run_status, heartbeat in messages:
+                for payload, run_status, _heartbeat in messages:
                     value = dict(payload)
-                    if value.get("status") == "running" and (
-                        run_status != "running" or heartbeat < utcnow() - timedelta(seconds=45)
-                    ):
-                        value["status"] = run_status if run_status != "running" else "stopped"
+                    if value.get("status") in {"running", "queued"}:
+                        value["status"] = run_status
                     payloads.append(value)
                 result.append({"id": str(row["id"]), "title": row["title"], "messages": payloads})
         return result
@@ -472,8 +483,7 @@ class AgentStore:
                     select(self.runs.c.id).where(
                         self.runs.c.conversation_id == id,
                         self.runs.c.owner_id == owner,
-                        self.runs.c.status == "running",
-                        self.runs.c.heartbeat_at >= utcnow() - timedelta(seconds=45),
+                        self.runs.c.status.in_(["running", "queued"]),
                     )
                 )
                 if active.first():
@@ -551,17 +561,24 @@ class AgentStore:
             )
         return {"run": dict(run), "messages": [dict(m) for m in messages]}
 
-    async def begin(self, owner, conversation_id, question, snapshot):
+    async def begin(
+        self, owner, conversation_id, question, snapshot, enqueue=None, before_begin=None
+    ):
         async with self.db.engine.begin() as c:
             # Serialize run allocation per owner, including starts in separate tabs/workers.
             users = self.db.metadata.tables[f"{self.db.schema}.access_users"]
             await c.execute(select(users.c.id).where(users.c.id == owner).with_for_update())
+            if before_begin:
+                await before_begin(c)
+            jobs = self.db.metadata.tables.get(f"{self.db.schema}.chat_run_jobs")
+            managed = select(jobs.c.run_id).where(jobs.c.run_id == self.runs.c.id).exists()
             await c.execute(
                 self.runs.update()
                 .where(
                     self.runs.c.owner_id == owner,
                     self.runs.c.status == "running",
                     self.runs.c.heartbeat_at < utcnow() - timedelta(seconds=45),
+                    ~managed,
                 )
                 .values(status="stopped", finished_at=utcnow())
             )
@@ -569,11 +586,14 @@ class AgentStore:
                 await c.execute(
                     select(func.count())
                     .select_from(self.runs)
-                    .where(self.runs.c.owner_id == owner, self.runs.c.status == "running")
+                    .where(
+                        self.runs.c.owner_id == owner, self.runs.c.status.in_(["running", "queued"])
+                    )
                 )
             ).scalar_one()
-            if count >= 2:
-                raise HTTPException(429, "最多同时运行两个对话，请先停止现有任务")
+            limit = self.db.settings.chat_owner_pending_limit if enqueue else 2
+            if count >= limit:
+                raise HTTPException(429, "待处理对话已达上限，请等待或停止现有任务")
             # An unguessable UUID is an identifier; ownership is always checked independently.
             await c.execute(
                 insert(self.conversations)
@@ -594,6 +614,7 @@ class AgentStore:
                     self.runs.c.conversation_id == conversation_id,
                     self.runs.c.status == "running",
                     self.runs.c.heartbeat_at < cutoff,
+                    ~managed,
                 )
                 .values(status="stopped", finished_at=utcnow())
             )
@@ -601,7 +622,7 @@ class AgentStore:
                 await c.execute(
                     select(self.runs.c.id).where(
                         self.runs.c.conversation_id == conversation_id,
-                        self.runs.c.status == "running",
+                        self.runs.c.status.in_(["running", "queued"]),
                     )
                 )
             ).first()
@@ -609,7 +630,12 @@ class AgentStore:
                 raise HTTPException(409, "这个对话仍在运行，请先停止或稍后重试")
             rows = (
                 await c.execute(
-                    select(self.messages.c.payload, self.messages.c.position)
+                    select(
+                        self.messages.c.payload,
+                        self.messages.c.position,
+                        self.runs.c.status.label("run_status"),
+                    )
+                    .join(self.runs, self.runs.c.id == self.messages.c.run_id)
                     .where(
                         self.messages.c.conversation_id == conversation_id,
                         self.messages.c.owner_id == owner,
@@ -631,12 +657,18 @@ class AgentStore:
             )
             # LangChain's compacted message state is independent from the full UI
             # transcript. Never discard old turns before the middleware can summarize.
+            if context:
+                covered = next((r for r in rows if r.position == context["through_position"]), None)
+                # Stop may win after the compacted context committed. Do not reuse
+                # that cancelled turn as a completed task; rebuild annotated history.
+                if covered is None or covered.run_status != "completed":
+                    context = None
             history = messages_from_dict(context["messages"]) if context else []
             history += [
-                {"role": r.payload["role"], "content": r.payload.get("content", "")}
+                message
                 for r in rows
-                if r.payload.get("content")
-                and (not context or r.position > context["through_position"])
+                if (not context or r.position > context["through_position"])
+                and (message := history_message({**r.payload, "status": r.run_status})) is not None
             ]
             position = rows[-1].position + 1 if rows else 0
             run_id = uuid4()
@@ -656,7 +688,9 @@ class AgentStore:
                 "tools": [],
                 "todos": [],
                 "presentations": [],
-                "status": "running",
+                "status": "queued" if enqueue else "running",
+                "runId": str(run_id),
+                "eventSeq": 0,
                 "modelId": snapshot["model_id"],
                 "toolAccess": snapshot["tools"],
             }
@@ -665,7 +699,7 @@ class AgentStore:
                     id=run_id,
                     owner_id=owner,
                     conversation_id=conversation_id,
-                    status="running",
+                    status="queued" if enqueue else "running",
                     snapshot=snapshot,
                     started_at=now,
                     heartbeat_at=now,
@@ -701,13 +735,43 @@ class AgentStore:
                 .where(self.conversations.c.id == conversation_id)
                 .values(updated_at=now)
             )
+            if enqueue:
+                await enqueue(c, run_id, assistant_id, history, assistant)
         return run_id, assistant_id, history, assistant
 
-    async def save_context(self, run_id, assistant_id, owner, messages):
+    async def guard_run(self, conn, run_id, lease_token):
+        if lease_token is None:
+            return
+        jobs = self.db.metadata.tables[f"{self.db.schema}.chat_run_jobs"]
+        row = await conn.scalar(
+            select(jobs.c.run_id)
+            .where(
+                jobs.c.run_id == run_id,
+                jobs.c.lease_token == lease_token,
+                jobs.c.phase == "running",
+                jobs.c.lease_until > utcnow(),
+            )
+            .with_for_update()
+        )
+        if row is None:
+            raise RunLeaseLost("Run execution lease is no longer valid")
+
+    async def save_context(self, run_id, assistant_id, owner, messages, *, lease_token=None):
         import json
 
         serialized = json.loads(json.dumps(messages_to_dict(messages), default=str))
+        # Reasoning is a UI transcript, not an instruction or an answer to replay.
+        for message in serialized:
+            message["data"].get("additional_kwargs", {}).pop("reasoning_content", None)
+            content = message["data"].get("content")
+            if isinstance(content, list):
+                message["data"]["content"] = [
+                    part
+                    for part in content
+                    if not isinstance(part, dict) or part.get("type") != "reasoning"
+                ]
         async with self.db.engine.begin() as c:
+            await self.guard_run(c, run_id, lease_token)
             row = (
                 await c.execute(
                     select(self.messages.c.conversation_id, self.messages.c.position).where(
@@ -736,8 +800,9 @@ class AgentStore:
                 )
             )
 
-    async def update_title(self, owner, conversation_id, title):
+    async def update_title(self, owner, conversation_id, title, *, run_id=None, lease_token=None):
         async with self.db.engine.begin() as c:
+            await self.guard_run(c, run_id, lease_token)
             await self.require_conversation(c, owner, conversation_id)
             await c.execute(
                 self.conversations.update()
@@ -748,8 +813,9 @@ class AgentStore:
                 .values(title=title, updated_at=utcnow())
             )
 
-    async def save(self, run_id, assistant_id, owner, payload, final=False):
+    async def save(self, run_id, assistant_id, owner, payload, final=False, *, lease_token=None):
         async with self.db.engine.begin() as c:
+            await self.guard_run(c, run_id, lease_token)
             await c.execute(
                 self.messages.update()
                 .where(

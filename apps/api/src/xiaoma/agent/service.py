@@ -13,8 +13,11 @@ from langchain.agents.middleware.tool_call_limit import ToolCallLimitExceededErr
 from langchain_core.messages import ToolMessage
 from langgraph.types import Command
 
+from ..database import utcnow
 from ..errors import IngestionError
 from .builder import build_agent, build_system_prompt
+from .compatible_model import reasoning_text
+from .reasoning import apply_reasoning_event, close_reasoning
 from .resilience import (
     ContextBudgetExceeded,
     RepeatedToolFailure,
@@ -61,7 +64,7 @@ class AgentService:
         self.store = store
         self.models = models
 
-    async def prepare(self, principal, body):
+    async def prepare(self, principal, body, enqueue=None, before_begin=None):
         await self.auth.assert_active(principal)
         await self.auth.rate_limit(str(principal.user_id), "agent-run", 20)
         model, description = await self.models.resolve(body.model_id)
@@ -75,7 +78,7 @@ class AgentService:
             raise HTTPException(422, "所选 Skill 已停用、不存在或依赖的查询工具已关闭")
         body.skills = requested
         trigger, keep = context_budget(self.db.settings, description["profile"])
-        system_prompt = build_system_prompt(skills, requested)
+        system_prompt = build_system_prompt(skills, requested, body.tools)
         snapshot = {
             "system_prompt": system_prompt,
             "system_prompt_sha256": hashlib.sha256(system_prompt.encode()).hexdigest(),
@@ -113,12 +116,21 @@ class AgentService:
                 "repeated_tool_failure_limit": self.db.settings.chat_repeated_tool_failure_limit,
             },
         }
+
+        async def dispatch(conn, run_id, assistant_id, history, payload):
+            await enqueue(conn, run_id, assistant_id, history, payload, skills)
+
         run_id, message_id, history, payload = await self.store.begin(
-            principal.user_id, body.conversation_id, body.question, snapshot
+            principal.user_id,
+            body.conversation_id,
+            body.question,
+            snapshot,
+            enqueue=dispatch if enqueue else None,
+            before_begin=before_begin,
         )
         return model, skills, run_id, message_id, history, payload
 
-    async def stream(self, principal, body, prepared, request):
+    async def stream(self, principal, body, prepared, request, *, lease_token=None):
         model, skills, run_id, message_id, history, payload = prepared
         queue = asyncio.Queue(maxsize=512)
 
@@ -139,6 +151,21 @@ class AgentService:
         records = {}
         final_context = {}
         speaking = set()
+        reasoning_started = {}
+        reasoning_finished = set()
+
+        async def finish_reasoning(id):
+            if id in reasoning_started and id not in reasoning_finished:
+                reasoning_finished.add(id)
+                await queue.put(
+                    {
+                        "type": "reasoning",
+                        "id": id,
+                        "state": "completed",
+                        "durationMs": round((time.monotonic() - reasoning_started[id]) * 1000),
+                    }
+                )
+
         last_check = 0
         last_save = 0
 
@@ -154,7 +181,13 @@ class AgentService:
                     },
                 )
                 await self.auth.assert_active(principal)
-                await self.store.update_title(principal.user_id, body.conversation_id, title)
+                await self.store.update_title(
+                    principal.user_id,
+                    body.conversation_id,
+                    title,
+                    run_id=run_id,
+                    lease_token=lease_token,
+                )
                 await queue.put(
                     {
                         "type": "conversation",
@@ -209,7 +242,10 @@ class AgentService:
                         elif kind == "on_chat_model_start":
                             if any(r["name"] != "write_todos" for r in records.values()):
                                 await queue.put({"type": "step", "text": "正在核对结果，继续处理"})
+                            else:
+                                await queue.put({"type": "step", "text": "正在等待模型响应"})
                         elif kind == "on_chat_model_end":
+                            await finish_reasoning(id)
                             response = data.get("output")
                             if (
                                 getattr(response, "response_metadata", {}).get("finish_reason")
@@ -221,6 +257,24 @@ class AgentService:
                                 )
                         elif kind == "on_chat_model_stream":
                             chunk = data["chunk"]
+                            thinking = reasoning_text(chunk)
+                            if thinking:
+                                first_thought = id not in reasoning_started
+                                if first_thought:
+                                    reasoning_started[id] = time.monotonic()
+                                await queue.put(
+                                    {
+                                        "type": "reasoning",
+                                        "id": id,
+                                        "text": thinking,
+                                        "state": "streaming",
+                                        **(
+                                            {"startedAt": utcnow().isoformat()}
+                                            if first_thought
+                                            else {}
+                                        ),
+                                    }
+                                )
                             content = chunk.content
                             text = (
                                 content
@@ -231,6 +285,8 @@ class AgentService:
                                     if isinstance(p, dict) and p.get("type") == "text"
                                 )
                             )
+                            if text or chunk.tool_call_chunks:
+                                await finish_reasoning(id)
                             if text:
                                 if id not in speaking:
                                     speaking.add(id)
@@ -250,6 +306,7 @@ class AgentService:
                                 "id": id,
                                 "name": name,
                                 "title": TOOL_TITLES.get(name, name),
+                                "startedAt": utcnow().isoformat(),
                                 "state": "input-available",
                                 "input": data.get("input", {}),
                             }
@@ -379,6 +436,8 @@ class AgentService:
                 kind = event["type"]
                 if kind == "delta":
                     payload["content"] += event["text"]
+                elif kind == "reasoning":
+                    apply_reasoning_event(payload, event)
                 elif kind == "step":
                     payload["steps"].append(event["text"])
                 elif kind == "tool":
@@ -400,14 +459,20 @@ class AgentService:
                 elif kind == "complete":
                     if "messages" in final_context:
                         await self.store.save_context(
-                            run_id, message_id, principal.user_id, final_context["messages"]
+                            run_id,
+                            message_id,
+                            principal.user_id,
+                            final_context["messages"],
+                            lease_token=lease_token,
                         )
                     payload["status"] = "completed"
                     yield encode(event)
                     break
                 yield encode(event)
                 if now - last_save > 1:
-                    await self.store.save(run_id, message_id, principal.user_id, payload)
+                    await self.store.save(
+                        run_id, message_id, principal.user_id, payload, lease_token=lease_token
+                    )
                     last_save = now
         except HTTPException as exc:
             payload.update(status="error", error=str(exc.detail))
@@ -422,10 +487,25 @@ class AgentService:
             if payload["status"] == "running":
                 payload["status"] = "stopped"
             if payload["status"] in ("stopped", "error"):
+                close_reasoning(payload, payload["status"])
                 for record in payload["tools"]:
                     if record["state"] == "input-available":
                         record.update(state="output-error", errorText="本轮已停止，未取得完整结果")
-            # Persist partial output and release the lease even when a browser stops generation.
+            if payload["status"] in ("stopped", "error"):
+                for todo in payload.get("todos", []):
+                    if todo["status"] == "in_progress":
+                        todo["status"] = "blocked" if payload["status"] == "error" else "pending"
+                for slot in payload.get("presentations", []):
+                    if slot["status"] == "loading":
+                        slot.update(status=payload["status"], error=payload.get("error"))
+            # Persist partial output and release the worker lease after an explicit stop.
             await asyncio.shield(
-                self.store.save(run_id, message_id, principal.user_id, payload, final=True)
+                self.store.save(
+                    run_id,
+                    message_id,
+                    principal.user_id,
+                    payload,
+                    final=True,
+                    lease_token=lease_token,
+                )
             )

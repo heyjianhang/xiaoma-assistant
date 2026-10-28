@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,12 +11,17 @@ import { formatValue, SampleSql, SampleTable } from "./query-details";
 
 export function DataViewCard({ payload }: { payload: DataPresentation }) {
   const { result, columns, view, xKey } = payload;
+  const hasOverview = view !== "table" && result.rows.length > 0;
+  // A streamed SQL table can later become a chart in the same slot.
+  // Follow that upgrade until the user explicitly chooses a tab.
+  const [selectedTab, setSelectedTab] = useState<string | null>(null);
+  const activeTab = selectedTab ?? (hasOverview ? "view" : "data");
   const config = Object.fromEntries(columns.map((column, index) => [`series${index}`, { label: `${column.label}${column.format === "percent" ? "（%）" : column.format === "money" ? "（元）" : ""}`, color: index ? "var(--chart-2)" : "var(--brand, #3d7eff)" }])) satisfies ChartConfig;
   const allColumns = xKey ? [{ key: xKey, label: xKey }, ...columns] : columns;
   return <Card tone="info" aria-label={payload.title} className="min-w-0">
     <CardHeader><CardTitle>{payload.title}</CardTitle><CardDescription>{result.scope}</CardDescription><CardAction><Badge variant="outline">{(result.executed || result.provenance.startsWith("真实只读")) ? "只读查询" : "历史样例"}</Badge></CardAction></CardHeader>
-    <CardContent className="min-w-0"><Tabs className="min-w-0" defaultValue={view === "table" || !result.rows.length ? "data" : "view"}>
-      <TabsList aria-label={`${payload.title}显示方式`}>{view !== "table" && !!result.rows.length && <TabsTrigger value="view">{view === "metrics" ? "概览" : "图表"}</TabsTrigger>}<TabsTrigger value="data">数据</TabsTrigger><TabsTrigger value="sql">SQL</TabsTrigger></TabsList>
+    <CardContent className="min-w-0"><Tabs className="min-w-0" value={activeTab === "view" && !hasOverview ? "data" : activeTab} onValueChange={setSelectedTab}>
+      <TabsList aria-label={`${payload.title}显示方式`}>{hasOverview && <TabsTrigger value="view">{view === "metrics" ? "概览" : "图表"}</TabsTrigger>}<TabsTrigger value="data">数据</TabsTrigger><TabsTrigger value="sql">SQL</TabsTrigger></TabsList>
       <TabsContent value="view" className="pt-3">
         {view === "metrics" && <dl className="grid grid-cols-2 gap-5 xl:grid-cols-4">{columns.map(column => <div key={column.key} className="flex min-w-0 flex-col gap-2"><dt className="text-xs text-muted-foreground">{column.label}</dt><dd className="break-words text-xl font-semibold tabular-nums tracking-tight">{formatValue(result.rows[0]?.[column.key] ?? null, column.format)}</dd></div>)}</dl>}
         {view === "bar" && xKey && <ChartContainer config={config} className="h-64 w-full" aria-label={payload.title}><BarChart accessibilityLayer data={result.rows} margin={{ left: 0, right: 12, top: 8, bottom: 0 }}>

@@ -1,5 +1,4 @@
 import asyncio
-import contextlib
 import time
 from contextlib import asynccontextmanager
 from typing import Annotated
@@ -14,6 +13,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from .access import ADMIN_ID, AccessStore, Principal
 from .access_routes import router as access_router
+from .agent.background import BackgroundRuns
 from .agent.models import ModelCatalog
 from .agent.routes import router as agent_router
 from .agent.service import AgentService
@@ -37,7 +37,11 @@ class SearchRequest(BaseModel):
 
 
 def create_app(
-    settings: Settings | None = None, *, start_worker: bool = True, auth_test_mode: bool = False
+    settings: Settings | None = None,
+    *,
+    start_worker: bool = True,
+    auth_test_mode: bool = False,
+    start_chat_worker: bool = True,
 ) -> FastAPI:
     holder = {}
 
@@ -50,6 +54,8 @@ def create_app(
         auth = AccessStore(db)
         agents = AgentStore(db)
         models = ModelCatalog(configuration)
+        agent_service = AgentService(db, business, auth, agents, models)
+        background = BackgroundRuns(db, agent_service)
         if auth_test_mode and not configuration.knowledge_schema.startswith("test_"):
             raise RuntimeError("Authentication bypass is restricted to isolated test schemas")
         try:
@@ -64,21 +70,33 @@ def create_app(
                 auth=auth,
                 agents=agents,
                 models=models,
-                agent_service=AgentService(db, business, auth, agents, models),
+                agent_service=agent_service,
+                background_runs=background,
             )
             application.state.access = auth
             application.state.agent_store = agents
             application.state.model_catalog = models
             application.state.db = db
             application.state.ingestion = service
-            worker = asyncio.create_task(service.worker()) if start_worker else None
+            application.state.background_runs = background
+            if start_chat_worker and configuration.background_workers_enabled:
+                background.start()
+            workers = (
+                [
+                    asyncio.create_task(service.worker())
+                    for _ in range(configuration.ingestion_worker_concurrency)
+                ]
+                if (start_worker and configuration.background_workers_enabled)
+                else []
+            )
+            await service.migrate_queue()
             try:
                 yield
             finally:
-                if worker:
+                for worker in workers:
                     worker.cancel()
-                    with contextlib.suppress(asyncio.CancelledError):
-                        await worker
+                await asyncio.gather(*workers, return_exceptions=True)
+                await background.close()
         finally:
             await business.close()
             await db.close()

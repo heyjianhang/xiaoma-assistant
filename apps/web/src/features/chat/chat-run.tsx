@@ -1,11 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef } from "react";
+import { CircleAlertIcon, CirclePauseIcon, LoaderCircleIcon } from "lucide-react";
 import { ChainOfThought, ChainOfThoughtContent, ChainOfThoughtHeader } from "@/components/ai-elements/chain-of-thought";
 import { Tool, ToolContent, ToolHeader, ToolInput, ToolOutput } from "@/components/ai-elements/tool";
 import { Spinner } from "@/components/ui/spinner";
 import { MarkdownPreview } from "@/components/markdown-preview";
-import type { ChatMessage } from "@/lib/services/contracts";
+import type { ChatMessage, ChatToolCall } from "@/lib/services/contracts";
+import { useDisclosurePreference } from "@/lib/services/provider";
+import { ChatReasoning } from "./chat-reasoning";
+import { processView } from "./process-view";
 
 function retrievedChunks(output: unknown) {
   if (!output || typeof output !== "object" || !("chunks" in output) || !Array.isArray(output.chunks)) return undefined;
@@ -15,26 +19,47 @@ function retrievedChunks(output: unknown) {
 }
 
 export function ChatRun({ message, generating }: { message: ChatMessage; generating: boolean }) {
-  const [processOpen, setProcessOpen] = useState<boolean | undefined>();
-  const tools = (message.tools ?? []).filter(tool => tool.name !== "write_todos");
-  const hasError = message.status === "error";
-  const interrupted = message.status === "stopped";
-  const summary = generating ? (message.steps?.at(-1) ?? "小马开工啦，先理理思路")
-    : hasError ? "这一步卡住了" : interrupted ? "先停在这里" : tools.length ? `这轮查好了 · ${tools.length} 次工具调用` : "这轮聊完啦";
+  const view = processView(message, generating);
+  // Running inspection must not pin the process open after completion.
+  // A separate finished scope still lets users reopen completed details.
+  const disclosurePhase = generating ? "running" : view.failed ? "failed" : "finished";
+  const [open, setOpen, inspected] = useDisclosurePreference(`${message.id}:process:${disclosurePhase}`, view.automaticOpen);
+  const viewport = useRef<HTMLDivElement>(null);
+  const latestEntry = view.entries.at(-1)?.id;
+  useEffect(() => {
+    if (generating && open && !inspected && viewport.current) {
+      viewport.current.scrollTop = viewport.current.scrollHeight;
+    }
+  }, [generating, open, inspected, latestEntry]);
+  if (!view.details) return view.waiting ? <div className="flex items-center gap-2 text-sm text-muted-foreground" role="status"><Spinner aria-hidden="true" className="size-3.5 shrink-0" /><span>{view.label}</span></div> : null;
+  const active = generating && !view.failed && !view.stopped;
+  return <ChainOfThought open={open} onOpenChange={setOpen}>
+    <ChainOfThoughtHeader aria-label={`${view.label}，${open ? "收起" : "展开"}处理过程`}
+      icon={active ? LoaderCircleIcon : view.failed ? CircleAlertIcon : view.stopped ? CirclePauseIcon : null}
+      iconClassName={active ? "animate-spin" : undefined}>
+      <span role={active ? "status" : undefined}>{view.label}</span>
+    </ChainOfThoughtHeader>
+    <ChainOfThoughtContent ref={viewport} className="max-h-96 overflow-y-auto pr-1" aria-label="处理过程详情" onScroll={event => {
+      const element = event.currentTarget;
+      if (generating && !inspected && element.scrollHeight - element.scrollTop - element.clientHeight > 24) setOpen(true);
+    }}>
+      {view.entries.map(entry => entry.kind === "reasoning"
+        ? <ChatReasoning key={`reason:${entry.id}`} part={entry.value} messageId={message.id} generating={generating}
+            automaticOpen={view.automaticOpen} onInspect={() => setOpen(true)} />
+        : <ChatToolStep key={`tool:${entry.id}`} tool={entry.value} messageId={message.id}
+            failed={view.failed} onInspect={() => setOpen(true)} />)}
+    </ChainOfThoughtContent>
+  </ChainOfThought>;
+}
 
-  if (!tools.length) return generating && !message.content ? <div className="flex items-center gap-2 text-sm text-muted-foreground" role="status"><Spinner aria-hidden="true" className="size-3.5 shrink-0" /><span>{summary}</span></div> : null;
-
-  return <div className="flex w-full min-w-0 flex-col gap-4">
-    <ChainOfThought open={processOpen ?? (hasError || interrupted)} onOpenChange={setProcessOpen}>
-      <ChainOfThoughtHeader aria-label="处理过程">
-        <span className="flex min-w-0 items-center gap-2" role={generating ? "status" : undefined}>{generating && <Spinner aria-hidden="true" className="size-3.5 shrink-0" />}<span className="truncate">{summary}</span></span>
-      </ChainOfThoughtHeader>
-      <ChainOfThoughtContent className="gap-2">
-        {tools.map(tool => <Tool key={tool.id} className="mb-0" defaultOpen={tool.state === "output-error"}>
-          <ToolHeader type="dynamic-tool" toolName={tool.name} title={tool.title} state={tool.state} />
-          <ToolContent><ToolInput input={tool.input} /><ToolOutput output={tool.name === "search_knowledge_base" ? retrievedChunks(tool.output) ?? tool.output : tool.output} errorText={tool.errorText} /></ToolContent>
-        </Tool>)}
-      </ChainOfThoughtContent>
-    </ChainOfThought>
-  </div>;
+function ChatToolStep({ tool, messageId, failed, onInspect }: {
+  tool: ChatToolCall; messageId: string; failed: boolean; onInspect: () => void;
+}) {
+  const [open, setOpen] = useDisclosurePreference(`${messageId}:tool:${tool.id}`, failed && tool.state === "output-error");
+  return <Tool className="mb-0" open={open} onOpenChange={next => {
+    setOpen(next); if (next) onInspect();
+  }}>
+    <ToolHeader type="dynamic-tool" toolName={tool.name} title={tool.title} state={tool.state} />
+    <ToolContent><ToolInput input={tool.input} /><ToolOutput output={tool.name === "search_knowledge" || tool.name === "search_knowledge_base" ? retrievedChunks(tool.output) ?? tool.output : tool.output} errorText={tool.errorText} /></ToolContent>
+  </Tool>;
 }

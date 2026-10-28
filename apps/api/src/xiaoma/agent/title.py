@@ -6,6 +6,7 @@ import re
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 
+from .model_behavior import plain_response_settings
 from .resilience import is_transient
 
 
@@ -22,7 +23,9 @@ async def generate_conversation_title(model, first_question, metadata):
     )
     # Reasoning-capable compatible models also charge their internal thinking
     # against this budget. 64 tokens can finish before any title text is emitted.
-    chain = (prompt | model.bind(max_tokens=512) | StrOutputParser()).with_retry(
+    chain = (
+        prompt | model.bind(max_tokens=512, **plain_response_settings(model)) | StrOutputParser()
+    ).with_retry(
         retry_if_exception_type=is_transient,
         stop_after_attempt=3,
         exponential_jitter_params={"initial": 1, "max": 2},

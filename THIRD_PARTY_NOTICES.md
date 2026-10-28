@@ -5,6 +5,7 @@
 | 来源 | 目录 | 上游许可 |
 | --- | --- | --- |
 | [Vercel AI Elements](https://github.com/vercel/ai-elements) | `apps/web/src/components/ai-elements/` | Apache-2.0，见 [上游声明](licenses/ai-elements-LICENSE) 和 [许可全文](licenses/Apache-2.0.txt) |
+| [PGMQ v1.13.0](https://github.com/pgmq/pgmq/tree/v1.13.0) | `third_party/pgmq/pgmq.sql`，上游原文未修改，SHA-256见 [manifest](third_party/pgmq/manifest.json) | PostgreSQL License，见 [许可](third_party/pgmq/LICENSE) |
 | [shadcn/ui](https://github.com/shadcn-ui/ui) | `apps/web/src/components/ui/` | MIT，见 [许可全文](licenses/shadcn-ui-LICENSE.md) |
 
 AI Elements 组件的适配包括本项目提示词输入、语音输入、工具/任务展示和文件树等交互。shadcn 组件按项目主题及布局组合使用。模型、数据库、框架和其他依赖的具体版本以 Python / pnpm 锁文件为准，其许可仍由各上游项目规定。

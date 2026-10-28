@@ -1,0 +1,351 @@
+{
+  "question": "按品类统计成功退款金额，并画柱状图，不限制日期。",
+  "catalog": [
+    {
+      "name": "orders",
+      "description": "支付订单头；运费为零，实付为订单明细实付之和"
+    },
+    {
+      "name": "order_items",
+      "description": "订单商品明细；一单多商品、多品类；价格及品类均为成交快照"
+    },
+    {
+      "name": "refunds",
+      "description": "退款申请与处理记录；允许同一订单多张合法退款单"
+    },
+    {
+      "name": "refund_items",
+      "description": "退款商品分配明细；成功及在途申请共同占用可退数量/金额，驳回撤销不占用"
+    },
+    {
+      "name": "customers",
+      "description": "虚构客户；不包含真实姓名、电话或地址"
+    },
+    {
+      "name": "products",
+      "description": "商品主数据；历史价格与品类以订单明细快照为准"
+    },
+    {
+      "name": "categories",
+      "description": "品类维表"
+    },
+    {
+      "name": "suppliers",
+      "description": "虚构供应商；准入流程对应业务文档"
+    },
+    {
+      "name": "regions",
+      "description": "地区维表；订单使用下单时的地区快照"
+    },
+    {
+      "name": "demo_context",
+      "description": "合成数据运行元数据；只有一行，非企业业务数据"
+    }
+  ],
+  "inspected": [
+    {
+      "table": "refunds",
+      "description": "退款申请与处理记录；允许同一订单多张合法退款单",
+      "primary_key": "refund_id",
+      "columns": [
+        {
+          "name": "refund_id",
+          "type": "integer",
+          "description": "退款主键",
+          "required": true,
+          "constraints": "NOT NULL; PRIMARY KEY (refund_id)",
+          "label": "退款 ID"
+        },
+        {
+          "name": "refund_no",
+          "type": "text",
+          "description": "退款业务编号",
+          "required": true,
+          "constraints": "NOT NULL; UNIQUE (refund_no)",
+          "label": "退款单号"
+        },
+        {
+          "name": "order_id",
+          "type": "integer",
+          "description": "所属订单外键",
+          "required": true,
+          "constraints": "NOT NULL; FOREIGN KEY (order_id) REFERENCES orders(order_id)",
+          "label": "订单 ID"
+        },
+        {
+          "name": "refund_status",
+          "type": "text",
+          "description": "requested=申请待验收，accepted=已验收待到账，completed=原路退款成功，rejected=驳回，cancelled=客户撤销",
+          "required": true,
+          "constraints": "NOT NULL; CHECK ((refund_status = ANY (ARRAY['requested'::text, 'accepted'::text, 'completed'::text, 'rejected'::text, 'cancelled'::text]))); CHECK (((refund_status = 'completed'::text) = (completed_at IS NOT NULL))); CHECK (((refund_status <> 'accepted'::text) OR (accepted_at IS NOT NULL)))",
+          "label": "退款状态"
+        },
+        {
+          "name": "refund_kind",
+          "type": "text",
+          "description": "refund_only=凭证验收后仅退款，return_and_refund=退货实物及材料验收后退款",
+          "required": true,
+          "constraints": "NOT NULL; CHECK ((refund_kind = ANY (ARRAY['refund_only'::text, 'return_and_refund'::text])))",
+          "label": "退款类型"
+        },
+        {
+          "name": "reason_code",
+          "type": "text",
+          "description": "quality=品质问题，damage=破损，wrong_item=错发，customer_choice=客户意愿",
+          "required": true,
+          "constraints": "NOT NULL; CHECK ((reason_code = ANY (ARRAY['quality'::text, 'damage'::text, 'wrong_item'::text, 'customer_choice'::text])))",
+          "label": "退款原因"
+        },
+        {
+          "name": "applied_at",
+          "type": "timestamptz",
+          "description": "提交退款申请时刻；用于选择适用制度版本",
+          "required": true,
+          "constraints": "NOT NULL; CHECK (((applied_at <= accepted_at) AND (accepted_at <= completed_at) AND (applied_at <= completed_at)))",
+          "label": "申请时间"
+        },
+        {
+          "name": "accepted_at",
+          "type": "timestamptz",
+          "description": "退货/证据材料完整并由售后验收通过的时刻；退款到账计时起点；NULL 时不得用申请、发货、签收或更新时间替代",
+          "required": false,
+          "constraints": "CHECK (((applied_at <= accepted_at) AND (accepted_at <= completed_at) AND (applied_at <= completed_at))); CHECK (((refund_status <> 'accepted'::text) OR (accepted_at IS NOT NULL)))",
+          "label": "验收时间"
+        },
+        {
+          "name": "completed_at",
+          "type": "timestamptz",
+          "description": "支付渠道确认原路退款成功时刻；仅 completed 有值；退款到账计时终点",
+          "required": false,
+          "constraints": "CHECK (((applied_at <= accepted_at) AND (accepted_at <= completed_at) AND (applied_at <= completed_at))); CHECK (((refund_status = 'completed'::text) = (completed_at IS NOT NULL)))",
+          "label": "到账时间"
+        },
+        {
+          "name": "payment_channel",
+          "type": "text",
+          "description": "原支付渠道快照，须与订单一致",
+          "required": true,
+          "constraints": "NOT NULL; CHECK ((payment_channel = ANY (ARRAY['wallet'::text, 'bank'::text])))",
+          "label": "支付渠道"
+        },
+        {
+          "name": "requested_amount",
+          "type": "numeric(12,2)",
+          "description": "申请金额=退款商品明细金额之和，单位元；完成成功时即成功退款金额",
+          "required": true,
+          "constraints": "NOT NULL; CHECK ((requested_amount > (0)::numeric))",
+          "label": "申请金额"
+        },
+        {
+          "name": "acceptance_note",
+          "type": "text",
+          "description": "验收备注；历史缺失记录保留原始说明，不自动补时间",
+          "required": true,
+          "constraints": "NOT NULL; ",
+          "label": "验收备注"
+        }
+      ],
+      "title": "退款单"
+    },
+    {
+      "table": "refund_items",
+      "description": "退款商品分配明细；成功及在途申请共同占用可退数量/金额，驳回撤销不占用",
+      "primary_key": "refund_item_id",
+      "columns": [
+        {
+          "name": "refund_item_id",
+          "type": "integer",
+          "description": "退款商品明细主键",
+          "required": true,
+          "constraints": "NOT NULL; PRIMARY KEY (refund_item_id)",
+          "label": "退款明细 ID"
+        },
+        {
+          "name": "refund_id",
+          "type": "integer",
+          "description": "退款单外键",
+          "required": true,
+          "constraints": "NOT NULL; FOREIGN KEY (refund_id) REFERENCES refunds(refund_id); UNIQUE (refund_id, order_item_id)",
+          "label": "退款 ID"
+        },
+        {
+          "name": "order_item_id",
+          "type": "integer",
+          "description": "原购买明细外键；必须属于退款头所指订单",
+          "required": true,
+          "constraints": "NOT NULL; FOREIGN KEY (order_item_id) REFERENCES order_items(order_item_id); UNIQUE (refund_id, order_item_id)",
+          "label": "订单明细 ID"
+        },
+        {
+          "name": "quantity",
+          "type": "integer",
+          "description": "本次申请退的件数",
+          "required": true,
+          "constraints": "NOT NULL; CHECK ((quantity > 0))",
+          "label": "数量"
+        },
+        {
+          "name": "amount",
+          "type": "numeric(12,2)",
+          "description": "本次分配金额，单位元；=数量×原明细实付单价",
+          "required": true,
+          "constraints": "NOT NULL; CHECK ((amount > (0)::numeric))",
+          "label": "退款金额"
+        }
+      ],
+      "title": "退款明细"
+    },
+    {
+      "table": "order_items",
+      "description": "订单商品明细；一单多商品、多品类；价格及品类均为成交快照",
+      "primary_key": "order_item_id",
+      "columns": [
+        {
+          "name": "order_item_id",
+          "type": "integer",
+          "description": "订单明细主键",
+          "required": true,
+          "constraints": "NOT NULL; PRIMARY KEY (order_item_id)",
+          "label": "订单明细 ID"
+        },
+        {
+          "name": "order_id",
+          "type": "integer",
+          "description": "所属订单外键",
+          "required": true,
+          "constraints": "NOT NULL; FOREIGN KEY (order_id) REFERENCES orders(order_id); UNIQUE (order_id, product_id)",
+          "label": "订单 ID"
+        },
+        {
+          "name": "product_id",
+          "type": "integer",
+          "description": "商品外键",
+          "required": true,
+          "constraints": "NOT NULL; FOREIGN KEY (product_id) REFERENCES products(product_id); UNIQUE (order_id, product_id)",
+          "label": "商品 ID"
+        },
+        {
+          "name": "category_id",
+          "type": "integer",
+          "description": "成交时品类快照，品类统计使用此字段",
+          "required": true,
+          "constraints": "NOT NULL; FOREIGN KEY (category_id) REFERENCES categories(category_id)",
+          "label": "品类 ID"
+        },
+        {
+          "name": "quantity",
+          "type": "integer",
+          "description": "购买件数",
+          "required": true,
+          "constraints": "NOT NULL; CHECK ((quantity > 0))",
+          "label": "数量"
+        },
+        {
+          "name": "unit_paid_price",
+          "type": "numeric(12,2)",
+          "description": "优惠分摊后的每件实付价，单位元；本包无额外运费",
+          "required": true,
+          "constraints": "NOT NULL; CHECK ((unit_paid_price > (0)::numeric))",
+          "label": "实付单价"
+        },
+        {
+          "name": "paid_amount",
+          "type": "numeric(12,2)",
+          "description": "该行实付金额，单位元；未支付为0，支付后=件数×实付单价",
+          "required": true,
+          "constraints": "NOT NULL; CHECK ((paid_amount >= (0)::numeric))",
+          "label": "实付金额"
+        }
+      ],
+      "title": "订单明细"
+    },
+    {
+      "table": "categories",
+      "description": "品类维表",
+      "primary_key": "category_id",
+      "columns": [
+        {
+          "name": "category_id",
+          "type": "integer",
+          "description": "品类主键",
+          "required": true,
+          "constraints": "NOT NULL; PRIMARY KEY (category_id)",
+          "label": "品类 ID"
+        },
+        {
+          "name": "category_name",
+          "type": "text",
+          "description": "中文品类名",
+          "required": true,
+          "constraints": "NOT NULL; UNIQUE (category_name)",
+          "label": "品类名称"
+        },
+        {
+          "name": "storage_condition",
+          "type": "text",
+          "description": "储运条件说明",
+          "required": true,
+          "constraints": "NOT NULL; ",
+          "label": "储运条件"
+        }
+      ],
+      "title": "品类"
+    }
+  ],
+  "linked": {
+    "tables": {
+      "refunds": [
+        "refund_id",
+        "refund_status"
+      ],
+      "refund_items": [
+        "refund_id",
+        "order_item_id",
+        "amount"
+      ],
+      "order_items": [
+        "order_item_id",
+        "category_id"
+      ],
+      "categories": [
+        "category_id",
+        "category_name"
+      ]
+    },
+    "joins": [
+      "refunds.refund_id = refund_items.refund_id",
+      "refund_items.order_item_id = order_items.order_item_id",
+      "order_items.category_id = categories.category_id"
+    ],
+    "grain": "以退款商品分配明细计金额，关联成交时品类快照，再按品类汇总"
+  },
+  "sql": "SELECT\n  \"c\".\"category_name\" AS \"category\",\n  SUM(\"ri\".\"amount\") AS \"refund_amount\"\nFROM \"business_v1\".\"refunds\" AS \"r\"\nJOIN \"business_v1\".\"refund_items\" AS \"ri\"\n  ON \"ri\".\"refund_id\" = \"r\".\"refund_id\"\nJOIN \"business_v1\".\"order_items\" AS \"oi\"\n  ON \"oi\".\"order_item_id\" = \"ri\".\"order_item_id\"\nJOIN \"business_v1\".\"categories\" AS \"c\"\n  ON \"c\".\"category_id\" = \"oi\".\"category_id\"\nWHERE\n  \"r\".\"refund_status\" = 'completed'\nGROUP BY\n  \"c\".\"category_id\",\n  \"c\".\"category_name\"\nORDER BY\n  \"refund_amount\" DESC,\n  \"c\".\"category_id\"",
+  "result": {
+    "rows": [
+      {
+        "category": "滋补礼盒",
+        "refund_amount": 5456.0
+      },
+      {
+        "category": "茗茶饮品",
+        "refund_amount": 2022.0
+      },
+      {
+        "category": "休闲零食",
+        "refund_amount": 1670.0
+      },
+      {
+        "category": "粮油干货",
+        "refund_amount": 1658.0
+      },
+      {
+        "category": "生鲜果蔬",
+        "refund_amount": 1224.0
+      }
+    ],
+    "row_count": 5,
+    "truncated": false,
+    "executed": true
+  },
+  "provenance": "合成数据包 · 独立只读 PostgreSQL 实测快照"
+}

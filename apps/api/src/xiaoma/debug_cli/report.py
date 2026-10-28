@@ -6,6 +6,7 @@ from datetime import datetime
 from uuid import uuid4
 from zoneinfo import ZoneInfo
 
+from ..agent.reasoning import apply_reasoning_event, close_reasoning
 from .client import CliError, private_json, private_write, secure_directory
 
 
@@ -64,6 +65,8 @@ class RunReport:
             self.result["answer"] += event["text"]
             if event["text"] and self.first_token is None:
                 self.first_token = elapsed
+        elif kind == "reasoning":
+            apply_reasoning_event(self.result, event)
         elif kind == "step":
             self.result["steps"].append(event["text"])
         elif kind == "tool":
@@ -79,10 +82,14 @@ class RunReport:
             existing = {item["id"]: item for item in self.result["presentations"]}
             existing[event["slot"]["id"]] = event["slot"]
             self.result["presentations"] = list(existing.values())
+        elif kind == "stopped":
+            self.result["status"] = "stopped"
+            close_reasoning(self.result, "stopped")
         elif kind == "complete":
             self.result["status"] = "completed"
         elif kind == "error":
             self.result.update(status="error", error=event["message"])
+            close_reasoning(self.result, "error")
 
     def finish(self):
         if self.result["status"] == "running":

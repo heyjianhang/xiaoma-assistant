@@ -1,0 +1,290 @@
+{
+  "questions": {
+    "A06": "2026年9月华东生鲜的订单退款率是多少？月报写的数值是否一致？",
+    "A12": "查询订单104的退款记录。它在新版生效后完成退款，是否应按新版24小时判为超时？请结合制度判断。",
+    "A04": "订单110有申请和到账时间，能否判断退款是否超时？请查制度和实际记录，不要用申请时间替代验收时间。",
+    "A07": "2026年9月西北滋补礼盒退款率100%，是否说明该品类普遍有问题？",
+    "A05": "请计算2026年9月的售后异常率。"
+  },
+  "reported_rate": 2.0,
+  "queries": {
+    "conflict": {
+      "id": "snapshot-conflict",
+      "questionId": "A06",
+      "sql": "WITH \"cohort\" AS (\n  SELECT DISTINCT\n    \"o\".\"order_id\" AS \"order_id\"\n  FROM \"business_v1\".\"orders\" AS \"o\"\n  JOIN \"business_v1\".\"order_items\" AS \"oi\"\n    ON \"oi\".\"order_id\" = \"o\".\"order_id\"\n  JOIN \"business_v1\".\"categories\" AS \"c\"\n    ON \"c\".\"category_id\" = \"oi\".\"category_id\"\n  JOIN \"business_v1\".\"regions\" AS \"g\"\n    ON \"g\".\"region_id\" = \"o\".\"region_id\"\n  WHERE\n    \"o\".\"paid_at\" >= '2026-09-01T00:00:00+08:00'\n    AND \"o\".\"paid_at\" < '2026-10-01T00:00:00+08:00'\n    AND \"g\".\"region_name\" = '华东'\n    AND \"c\".\"category_name\" = '生鲜果蔬'\n), \"successful\" AS (\n  SELECT DISTINCT\n    \"oi\".\"order_id\" AS \"order_id\",\n    \"r\".\"refund_id\" AS \"refund_id\"\n  FROM \"business_v1\".\"refunds\" AS \"r\"\n  JOIN \"business_v1\".\"refund_items\" AS \"ri\"\n    ON \"ri\".\"refund_id\" = \"r\".\"refund_id\"\n  JOIN \"business_v1\".\"order_items\" AS \"oi\"\n    ON \"oi\".\"order_item_id\" = \"ri\".\"order_item_id\"\n  JOIN \"business_v1\".\"categories\" AS \"c\"\n    ON \"c\".\"category_id\" = \"oi\".\"category_id\"\n  JOIN \"cohort\" AS \"p\"\n    ON \"p\".\"order_id\" = \"oi\".\"order_id\"\n  WHERE\n    \"r\".\"refund_status\" = 'completed'\n    AND \"r\".\"completed_at\" < '2026-10-01T00:00:00+08:00'\n    AND \"c\".\"category_name\" = '生鲜果蔬'\n)\nSELECT\n  COUNT(DISTINCT \"p\".\"order_id\") AS \"paid_orders\",\n  COUNT(DISTINCT \"s\".\"order_id\") AS \"refunded_orders\",\n  COUNT(DISTINCT \"s\".\"refund_id\") AS \"refund_sheets\",\n  ROUND(\n    CAST(100.0 * COUNT(DISTINCT \"s\".\"order_id\") / NULLIF(COUNT(DISTINCT \"p\".\"order_id\"), 0) AS DECIMAL),\n    2\n  ) AS \"refund_rate_percent\"\nFROM \"cohort\" AS \"p\"\nLEFT JOIN \"successful\" AS \"s\"\n  ON \"s\".\"order_id\" = \"p\".\"order_id\"",
+      "rows": [
+        {
+          "paid_orders": 100,
+          "refunded_orders": 8,
+          "refund_sheets": 10,
+          "refund_rate_percent": 8.0
+        }
+      ],
+      "schema": {
+        "tables": {
+          "orders": [
+            "order_id",
+            "region_id",
+            "paid_at"
+          ],
+          "order_items": [
+            "order_item_id",
+            "order_id",
+            "category_id"
+          ],
+          "refunds": [
+            "refund_id",
+            "refund_status",
+            "completed_at"
+          ],
+          "refund_items": [
+            "refund_id",
+            "order_item_id"
+          ],
+          "categories": [
+            "category_id",
+            "category_name"
+          ],
+          "regions": [
+            "region_id",
+            "region_name"
+          ]
+        },
+        "joins": [
+          "orders.order_id = order_items.order_id",
+          "orders.region_id = regions.region_id",
+          "order_items.category_id = categories.category_id",
+          "refund_items.order_item_id = order_items.order_item_id",
+          "refund_items.refund_id = refunds.refund_id"
+        ],
+        "grain": "按支付订单去重，退款沿原购买行匹配品类；同一订单多次退款仅计一笔退款订单"
+      },
+      "scope": "2026年9月支付队列；华东 / 生鲜果蔬；成功退款截止10月1日前；北京时间",
+      "provenance": "合成数据包 · 独立只读 PostgreSQL 实测快照",
+      "executed": true,
+      "truncated": false
+    },
+    "small": {
+      "id": "snapshot-small",
+      "questionId": "A07",
+      "sql": "WITH \"cohort\" AS (\n  SELECT DISTINCT\n    \"o\".\"order_id\" AS \"order_id\"\n  FROM \"business_v1\".\"orders\" AS \"o\"\n  JOIN \"business_v1\".\"order_items\" AS \"oi\"\n    ON \"oi\".\"order_id\" = \"o\".\"order_id\"\n  JOIN \"business_v1\".\"categories\" AS \"c\"\n    ON \"c\".\"category_id\" = \"oi\".\"category_id\"\n  JOIN \"business_v1\".\"regions\" AS \"g\"\n    ON \"g\".\"region_id\" = \"o\".\"region_id\"\n  WHERE\n    \"o\".\"paid_at\" >= '2026-09-01T00:00:00+08:00'\n    AND \"o\".\"paid_at\" < '2026-10-01T00:00:00+08:00'\n    AND \"g\".\"region_name\" = '西北'\n    AND \"c\".\"category_name\" = '滋补礼盒'\n), \"successful\" AS (\n  SELECT DISTINCT\n    \"oi\".\"order_id\" AS \"order_id\",\n    \"r\".\"refund_id\" AS \"refund_id\"\n  FROM \"business_v1\".\"refunds\" AS \"r\"\n  JOIN \"business_v1\".\"refund_items\" AS \"ri\"\n    ON \"ri\".\"refund_id\" = \"r\".\"refund_id\"\n  JOIN \"business_v1\".\"order_items\" AS \"oi\"\n    ON \"oi\".\"order_item_id\" = \"ri\".\"order_item_id\"\n  JOIN \"business_v1\".\"categories\" AS \"c\"\n    ON \"c\".\"category_id\" = \"oi\".\"category_id\"\n  JOIN \"cohort\" AS \"p\"\n    ON \"p\".\"order_id\" = \"oi\".\"order_id\"\n  WHERE\n    \"r\".\"refund_status\" = 'completed'\n    AND \"r\".\"completed_at\" < '2026-10-01T00:00:00+08:00'\n    AND \"c\".\"category_name\" = '滋补礼盒'\n)\nSELECT\n  COUNT(DISTINCT \"p\".\"order_id\") AS \"paid_orders\",\n  COUNT(DISTINCT \"s\".\"order_id\") AS \"refunded_orders\",\n  COUNT(DISTINCT \"s\".\"refund_id\") AS \"refund_sheets\",\n  ROUND(\n    CAST(100.0 * COUNT(DISTINCT \"s\".\"order_id\") / NULLIF(COUNT(DISTINCT \"p\".\"order_id\"), 0) AS DECIMAL),\n    2\n  ) AS \"refund_rate_percent\"\nFROM \"cohort\" AS \"p\"\nLEFT JOIN \"successful\" AS \"s\"\n  ON \"s\".\"order_id\" = \"p\".\"order_id\"",
+      "rows": [
+        {
+          "paid_orders": 3,
+          "refunded_orders": 3,
+          "refund_sheets": 3,
+          "refund_rate_percent": 100.0
+        }
+      ],
+      "schema": {
+        "tables": {
+          "orders": [
+            "order_id",
+            "region_id",
+            "paid_at"
+          ],
+          "order_items": [
+            "order_item_id",
+            "order_id",
+            "category_id"
+          ],
+          "refunds": [
+            "refund_id",
+            "refund_status",
+            "completed_at"
+          ],
+          "refund_items": [
+            "refund_id",
+            "order_item_id"
+          ],
+          "categories": [
+            "category_id",
+            "category_name"
+          ],
+          "regions": [
+            "region_id",
+            "region_name"
+          ]
+        },
+        "joins": [
+          "orders.order_id = order_items.order_id",
+          "orders.region_id = regions.region_id",
+          "order_items.category_id = categories.category_id",
+          "refund_items.order_item_id = order_items.order_item_id",
+          "refund_items.refund_id = refunds.refund_id"
+        ],
+        "grain": "按支付订单去重，退款沿原购买行匹配品类；同一订单多次退款仅计一笔退款订单"
+      },
+      "scope": "2026年9月支付队列；西北 / 滋补礼盒；成功退款截止10月1日前；北京时间",
+      "provenance": "合成数据包 · 独立只读 PostgreSQL 实测快照",
+      "executed": true,
+      "truncated": false
+    },
+    "zero": {
+      "id": "snapshot-zero",
+      "questionId": "A13",
+      "sql": "WITH \"cohort\" AS (\n  SELECT DISTINCT\n    \"o\".\"order_id\" AS \"order_id\"\n  FROM \"business_v1\".\"orders\" AS \"o\"\n  JOIN \"business_v1\".\"order_items\" AS \"oi\"\n    ON \"oi\".\"order_id\" = \"o\".\"order_id\"\n  JOIN \"business_v1\".\"categories\" AS \"c\"\n    ON \"c\".\"category_id\" = \"oi\".\"category_id\"\n  JOIN \"business_v1\".\"regions\" AS \"g\"\n    ON \"g\".\"region_id\" = \"o\".\"region_id\"\n  WHERE\n    \"o\".\"paid_at\" >= '2026-09-01T00:00:00+08:00'\n    AND \"o\".\"paid_at\" < '2026-10-01T00:00:00+08:00'\n    AND \"g\".\"region_name\" = '东北'\n    AND \"c\".\"category_name\" = '茗茶饮品'\n), \"successful\" AS (\n  SELECT DISTINCT\n    \"oi\".\"order_id\" AS \"order_id\",\n    \"r\".\"refund_id\" AS \"refund_id\"\n  FROM \"business_v1\".\"refunds\" AS \"r\"\n  JOIN \"business_v1\".\"refund_items\" AS \"ri\"\n    ON \"ri\".\"refund_id\" = \"r\".\"refund_id\"\n  JOIN \"business_v1\".\"order_items\" AS \"oi\"\n    ON \"oi\".\"order_item_id\" = \"ri\".\"order_item_id\"\n  JOIN \"business_v1\".\"categories\" AS \"c\"\n    ON \"c\".\"category_id\" = \"oi\".\"category_id\"\n  JOIN \"cohort\" AS \"p\"\n    ON \"p\".\"order_id\" = \"oi\".\"order_id\"\n  WHERE\n    \"r\".\"refund_status\" = 'completed'\n    AND \"r\".\"completed_at\" < '2026-10-01T00:00:00+08:00'\n    AND \"c\".\"category_name\" = '茗茶饮品'\n)\nSELECT\n  COUNT(DISTINCT \"p\".\"order_id\") AS \"paid_orders\",\n  COUNT(DISTINCT \"s\".\"order_id\") AS \"refunded_orders\",\n  COUNT(DISTINCT \"s\".\"refund_id\") AS \"refund_sheets\",\n  ROUND(\n    CAST(100.0 * COUNT(DISTINCT \"s\".\"order_id\") / NULLIF(COUNT(DISTINCT \"p\".\"order_id\"), 0) AS DECIMAL),\n    2\n  ) AS \"refund_rate_percent\"\nFROM \"cohort\" AS \"p\"\nLEFT JOIN \"successful\" AS \"s\"\n  ON \"s\".\"order_id\" = \"p\".\"order_id\"",
+      "rows": [
+        {
+          "paid_orders": 0,
+          "refunded_orders": 0,
+          "refund_sheets": 0,
+          "refund_rate_percent": null
+        }
+      ],
+      "schema": {
+        "tables": {
+          "orders": [
+            "order_id",
+            "region_id",
+            "paid_at"
+          ],
+          "order_items": [
+            "order_item_id",
+            "order_id",
+            "category_id"
+          ],
+          "refunds": [
+            "refund_id",
+            "refund_status",
+            "completed_at"
+          ],
+          "refund_items": [
+            "refund_id",
+            "order_item_id"
+          ],
+          "categories": [
+            "category_id",
+            "category_name"
+          ],
+          "regions": [
+            "region_id",
+            "region_name"
+          ]
+        },
+        "joins": [
+          "orders.order_id = order_items.order_id",
+          "orders.region_id = regions.region_id",
+          "order_items.category_id = categories.category_id",
+          "refund_items.order_item_id = order_items.order_item_id",
+          "refund_items.refund_id = refunds.refund_id"
+        ],
+        "grain": "按支付订单去重，退款沿原购买行匹配品类；同一订单多次退款仅计一笔退款订单"
+      },
+      "scope": "2026年9月支付队列；东北 / 茗茶饮品；成功退款截止10月1日前；北京时间",
+      "provenance": "合成数据包 · 独立只读 PostgreSQL 实测快照",
+      "executed": true,
+      "truncated": false
+    },
+    "version": {
+      "id": "snapshot-version",
+      "questionId": "A12",
+      "sql": "SELECT\n  \"r\".\"order_id\" AS \"order_id\",\n  \"r\".\"refund_no\" AS \"refund_no\",\n  \"r\".\"refund_status\" AS \"refund_status\",\n  \"r\".\"payment_channel\" AS \"payment_channel\",\n  TO_CHAR(\"r\".\"applied_at\", 'YYYY-MM-DD HH24:MI') AS \"applied_at\",\n  TO_CHAR(\"r\".\"accepted_at\", 'YYYY-MM-DD HH24:MI') AS \"accepted_at\",\n  TO_CHAR(\"r\".\"completed_at\", 'YYYY-MM-DD HH24:MI') AS \"completed_at\",\n  ROUND(\n    CAST(EXTRACT(EPOCH FROM (\n      \"r\".\"completed_at\" - \"r\".\"accepted_at\"\n    )) / 3600.0 AS DECIMAL),\n    2\n  ) AS \"elapsed_hours\"\nFROM \"business_v1\".\"refunds\" AS \"r\"\nWHERE\n  \"r\".\"order_id\" = 104\nORDER BY\n  \"r\".\"refund_no\"",
+      "rows": [
+        {
+          "order_id": 104,
+          "refund_no": "TK202609000014",
+          "refund_status": "completed",
+          "payment_channel": "wallet",
+          "applied_at": "2026-08-31 23:00",
+          "accepted_at": "2026-09-01 10:00",
+          "completed_at": "2026-09-03 10:00",
+          "elapsed_hours": 48.0
+        }
+      ],
+      "schema": {
+        "tables": {
+          "refunds": [
+            "order_id",
+            "refund_no",
+            "refund_status",
+            "payment_channel",
+            "applied_at",
+            "accepted_at",
+            "completed_at"
+          ]
+        },
+        "joins": [],
+        "grain": "逐张退款单核对业务时间"
+      },
+      "scope": "订单104的退款记录；全部时间为北京时间，不用申请时间替代验收时间",
+      "provenance": "合成数据包 · 独立只读 PostgreSQL 实测快照",
+      "executed": true,
+      "truncated": false
+    },
+    "missing": {
+      "id": "snapshot-missing",
+      "questionId": "A04",
+      "sql": "SELECT\n  \"r\".\"order_id\" AS \"order_id\",\n  \"r\".\"refund_no\" AS \"refund_no\",\n  \"r\".\"refund_status\" AS \"refund_status\",\n  \"r\".\"payment_channel\" AS \"payment_channel\",\n  TO_CHAR(\"r\".\"applied_at\", 'YYYY-MM-DD HH24:MI') AS \"applied_at\",\n  TO_CHAR(\"r\".\"accepted_at\", 'YYYY-MM-DD HH24:MI') AS \"accepted_at\",\n  TO_CHAR(\"r\".\"completed_at\", 'YYYY-MM-DD HH24:MI') AS \"completed_at\",\n  ROUND(\n    CAST(EXTRACT(EPOCH FROM (\n      \"r\".\"completed_at\" - \"r\".\"accepted_at\"\n    )) / 3600.0 AS DECIMAL),\n    2\n  ) AS \"elapsed_hours\"\nFROM \"business_v1\".\"refunds\" AS \"r\"\nWHERE\n  \"r\".\"order_id\" = 110\nORDER BY\n  \"r\".\"refund_no\"",
+      "rows": [
+        {
+          "order_id": 110,
+          "refund_no": "TK202609000020",
+          "refund_status": "completed",
+          "payment_channel": "wallet",
+          "applied_at": "2026-09-15 10:00",
+          "accepted_at": null,
+          "completed_at": "2026-09-18 10:00",
+          "elapsed_hours": null
+        }
+      ],
+      "schema": {
+        "tables": {
+          "refunds": [
+            "order_id",
+            "refund_no",
+            "refund_status",
+            "payment_channel",
+            "applied_at",
+            "accepted_at",
+            "completed_at"
+          ]
+        },
+        "joins": [],
+        "grain": "逐张退款单核对业务时间"
+      },
+      "scope": "订单110的退款记录；全部时间为北京时间，不用申请时间替代验收时间",
+      "provenance": "合成数据包 · 独立只读 PostgreSQL 实测快照",
+      "executed": true,
+      "truncated": false
+    }
+  },
+  "sources": {
+    "monthly": {
+      "file": "monthly-report.md",
+      "title": "2026年9月运营月报",
+      "clause": "REP-1.1 / REP-T1 / REP-2.1",
+      "excerpt": "## 1 月度观察范围\n\nREP-1.1 本报统计支付时间范围为 [2026-09-01 00:00:00+08:00, 2026-10-01 00:00:00+08:00)，退款观察截止为 2026-10-01 00:00:00+08:00（不含该时刻）。地区按订单收货地区快照，品类按成交明细快照，统一采用Asia/Shanghai。\n\nREP-1.2 订单退款率沿用《运营指标口径说明》MET-F1与MET-2.1：分母为范围内含目标品类的去重支付订单；分子为其中目标品类原购买行发生成功退款的去重订单，成功完成时间须早于统一截止。多次部分退款仅计一笔退款订单。\n\n## 2 华东生鲜果蔬经营观察\n\n表REP-T1 2026年9月华东生鲜果蔬运营摘要\n\n|观察范围|指标|本期数值|\n|---|---|---|\n|华东 / 生鲜果蔬|去重支付订单数|100笔|\n|华东 / 生鲜果蔬|生鲜果蔬明细实付金额|12,000.00元|\n|华东 / 生鲜果蔬|订单退款率|2%|\n\n注：支付范围与成功退款截止均见REP-1.1；订单退款率按MET-F1计算，不以退款单数或明细行数替代订单数。金额为品类明细实付，不扣退款。\n\nREP-2.1 本期华东生鲜果蔬订单退款率为2%。区域运营继续跟踪品质反馈、包装完整性与交承运方情况，后续按原购买明细核对具体售后原因。\n\nREP-2.2 客服交接时应区分支付订单、退款申请、成功退款单和去重退款订单。品类经营复盘同时查看实付金额、成功退款金额及履约情况，避免单一比例直接归因。"
+    },
+    "metrics": {
+      "file": "metric-definitions.md",
+      "title": "运营指标口径说明",
+      "clause": "MET-1.1 / MET-F1 / MET-2.1",
+      "excerpt": "## 1 统计范围与基础事实\n\nMET-1.1 本期月度观察支付范围为 [2026-09-01 00:00:00+08:00, 2026-10-01 00:00:00+08:00)；左闭右开。退款观察统一截止 2026-10-01 00:00:00+08:00，仅纳入完成时间严格早于截止时点的成功退款。演示当前时刻为 2026-10-27T12:00:00+08:00，“上个月”指2026年9月。所有时间采用Asia/Shanghai。\n\nMET-1.2 地区使用订单收货地区快照orders.region_id；品类使用order_items.category_id成交快照。一笔订单有多行目标品类也只计一笔订单；同一订单可分别进入多个品类的订单统计，跨品类去重汇总不能直接相加。\n\nMET-1.3 支付订单指paid_at位于观察范围且非空的订单。未支付订单不进入分母。成功退款指refund_status=completed且completed_at严格早于截止；申请、验收、驳回、撤销均不直接计成功。\n\n## 2 订单退款率与品类归属\n\nMET-F1 订单退款率 R = N / P × 100%\n\nP为支付范围、地区、品类均符合条件的去重支付订单数；N为其中截至截止时点至少一笔成功退款分配到目标品类原购买行的去重订单数。整店统计时不限定品类。P=0时R未定义，返回NULL并说明无支付订单。\n\n示例：某观察范围有50笔支付订单，其中5笔发生成功退款，即使对应7张退款单，R仍为5/50×100%=10%。\n\nMET-2.1 品类订单退款率的分子需沿refund_items.order_item_id回到原购买行，再核对品类快照。目标品类未退款的混合订单，不能仅因其他品类退款而计入该品类分子。品类退款金额只累计属于该品类的成功退款行金额。"
+    },
+    "display": {
+      "file": "metric-definitions.md",
+      "title": "运营指标口径说明",
+      "clause": "MET-T1",
+      "excerpt": "表MET-T1 数值单位与展示边界\n\n|指标|单位|展示要求|\n|---|---|---|\n|订单退款率|百分比/订单笔数|同时显示N、P与比例；P小于30时提示样本量不足，仅描述观察结果，不据此直接归因。|\n|实付及退款金额|人民币元|使用精确数值，保留两位小数；标明实付是否扣退款及品类金额归属。|\n|发货延迟占比|百分比/订单笔数|待到承诺时间的订单单列，截止未发订单纳入已到期范围。|\n|退款到账时长|自然小时|仅对验收和成功完成时间齐全的成功退款计算；样本数及缺失数须一并展示。|\n\n注：小样本提示阈值是展示约定，不是统计显著性检验；百分比不得脱离分子分母。"
+    },
+    "boundaries": {
+      "file": "metric-definitions.md",
+      "title": "运营指标口径说明",
+      "clause": "MET-F5 / MET-4.1 / MET-4.2",
+      "excerpt": "## 4 退款时效与解读纪律\n\nMET-F5 平均退款到账时长 H均 = Σ H_j / K\n\nH_j=(completed_at-accepted_at)/1小时；K为有完整验收与完成时间的成功退款单数。制度适用版本由applied_at决定；处理耗时不得以申请到完成的差替代。K=0时均值未定义。\n\n示例：两张成功退款单耗时12与24小时，H均=(12+24)/2=18小时；另一张缺少验收时间，标记无法判定并从均值样本中剔除。\n\nMET-4.1 同一指标出现来源差异时，应并列文档标题、编号条款、统计范围、截止时间及数据结果；仅凭差异不能断言具体原因。制度时限与实际耗时不同先作为执行时效核验，不能直接称为事实来源冲突。\n\nMET-4.2 本说明仅定义编号公式与条款列明的指标。未列名称不得自行拼接公式；需确认分子事件、分母范围、去重键、时间起点、截止与缺失处理，或分别展示已有指标。\n\nMET-4.3 时间趋势按支付日期归组，退款观察仍使用同一统计截止。按退款完成日期归组属于另一观察方式，展示时必须明确，不能与支付队列退款率混用。"
+    },
+    "old_policy": {
+      "file": "refund-policy-v1.md",
+      "title": "售后退款制度（旧版）",
+      "clause": "AS1-1.2 / AS1-T2 / AS1-3.3",
+      "excerpt": "## 1 总则与版本适用\n\nAS1-1.1 本制度适用于禾序食集线上食品订单的售后退款。金额以人民币元计，时间统一采用北京时间（Asia/Shanghai）；本制度使用自然小时连续计时，周末及节假日不顺延。\n\nAS1-1.2 本版受理范围为自 2026-07-01 00:00:00+08:00 起，至 2026-09-01 00:00:00+08:00 前提交的退款申请。以申请提交时间 applied_at 选择版本，不以支付、验收或到账日期选择；跨生效日完成的申请仍沿用提交时版本。\n\nAS1-1.3 退款申请单按退款编号独立跟踪。同一订单允许多次部分退款，累计有效申请与成功退款不得超过原购买数量及实付金额。驳回、撤销不占可退额度，处理中申请占用可退额度。\n\n## 3 材料验收与到账时限\n\nAS1-3.1 accepted_at 为售后确认退货实物与材料完整、验收通过的业务时刻；仅退款场景为证据材料验收通过时刻。applied_at 为申请提交时刻，completed_at 为原支付渠道确认退款成功时刻。三者含义不同。\n\n表AS1-T2 支付渠道退款到账时效\n\n|原支付渠道|验收后最长期限|责任与计时说明|\n|---|---|---|\n|电子钱包 wallet|48自然小时|从验收通过到支付渠道成功到账连续计时。客服核验渠道回执，财务处理在途差错。|\n|银行卡 bank|72自然小时|原路退回原支付账户；银行处理中仍纳入计时，异常应升级并保留回执。|\n\n注1：到达期限的同一时刻完成视为按时，只有实际耗时大于期限才判定超时。注2：缺少验收时间或成功到账时间，不能用其他业务时间补算已完成退款时长。\n\nAS1-3.2 表AS1-T2为第3.1条验收后到账阶段的最长时限，不是从客户申请起的总处理时长。受理等待和验收等待应分别展示，不得混入到账时效。\n\nAS1-F1 实际到账时长 H = (T完成 - T验收) / 1小时\n\nH为自然小时数；T完成为completed_at，T验收为accepted_at。H大于适用渠道期限判为超时，等于期限判为按时。\n\n示例：电子钱包验收后48小时完成，H=48，判为按时；49小时完成则判为超时。\n\nAS1-3.3 成功记录缺少 accepted_at 时标记“无法判定”，登记补录责任人；不得以申请、发货、签收、更新时间代填。在途已验收申请若截至统计时点仍未到账，可单列“进行中超时”，不得混入成功退款时长均值。"
+    },
+    "new_policy": {
+      "file": "refund-policy-v2.md",
+      "title": "售后退款制度（新版）",
+      "clause": "AS2-1.2 / AS2-T2 / AS2-3.3",
+      "excerpt": "## 1 总则与版本适用\n\nAS2-1.1 本制度适用于禾序食集线上食品订单的售后退款。金额以人民币元计，时间统一采用北京时间（Asia/Shanghai）；本制度使用自然小时连续计时，周末及节假日不顺延。\n\nAS2-1.2 本版受理范围为自 2026-09-01 00:00:00+08:00 起提交的退款申请。以申请提交时间 applied_at 选择版本，不以支付、验收或到账日期选择；跨生效日完成的申请仍沿用提交时版本。\n\nAS2-1.3 退款申请单按退款编号独立跟踪。同一订单允许多次部分退款，累计有效申请与成功退款不得超过原购买数量及实付金额。驳回、撤销不占可退额度，处理中申请占用可退额度。\n\n## 3 材料验收与到账时限\n\nAS2-3.1 accepted_at 为售后确认退货实物与材料完整、验收通过的业务时刻；仅退款场景为证据材料验收通过时刻。applied_at 为申请提交时刻，completed_at 为原支付渠道确认退款成功时刻。三者含义不同。\n\n表AS2-T2 支付渠道退款到账时效\n\n|原支付渠道|验收后最长期限|责任与计时说明|\n|---|---|---|\n|电子钱包 wallet|24自然小时|从验收通过到支付渠道成功到账连续计时。客服核验渠道回执，财务处理在途差错。|\n|银行卡 bank|48自然小时|原路退回原支付账户；银行处理中仍纳入计时，异常应升级并保留回执。|\n\n注1：到达期限的同一时刻完成视为按时，只有实际耗时大于期限才判定超时。注2：缺少验收时间或成功到账时间，不能用其他业务时间补算已完成退款时长。\n\nAS2-3.2 表AS2-T2为第3.1条验收后到账阶段的最长时限，不是从客户申请起的总处理时长。受理等待和验收等待应分别展示，不得混入到账时效。\n\nAS2-F1 实际到账时长 H = (T完成 - T验收) / 1小时\n\nH为自然小时数；T完成为completed_at，T验收为accepted_at。H大于适用渠道期限判为超时，等于期限判为按时。\n\n示例：电子钱包验收后24小时完成，H=24，判为按时；25小时完成则判为超时。\n\nAS2-3.3 成功记录缺少 accepted_at 时标记“无法判定”，登记补录责任人；不得以申请、发货、签收、更新时间代填。在途已验收申请若截至统计时点仍未到账，可单列“进行中超时”，不得混入成功退款时长均值。"
+    }
+  }
+}

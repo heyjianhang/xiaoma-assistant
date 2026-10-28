@@ -1,14 +1,14 @@
 # Agent 预算与标准 Skill 实现
 
-本文说明基于 Model Profile 的比例预算和标准 Skill 包实现。
+本文说明基于 Model Profile 的比例预算和标准 Skill 包实现。提示词、Skill 与工具的分工及核对卡契约见 [协作设计](prompt-and-skills.md)。
 
 ## 最终组装入口
 
 `apps/api/src/xiaoma/agent/builder.py`
 
-`build_agent(...)` 集中组装模型、按开关注册的工具、系统提示词、用户选中的 Skill 和全部中间件。`service.py` 负责认证、运行快照、SSE、标题与保存结果；模型资料位于 `models.py`，预算和容错位于 `resilience.py`。
+`build_agent(...)` 集中组装模型、按开关注册的工具、系统提示词、用户选中的 Skill 和全部中间件。`background.py` 负责后台调度、执行令牌及可补读事件；`service.py` 负责认证、运行快照、Agent 流、标题与保存结果；模型资料位于 `models.py`，预算和容错位于 `resilience.py`。
 
-内置技能位于 `skills/`，包含 `knowledge`、`sql`、`evidence-review`、`visualize`。每份都是标准 `SKILL.md` 目录，SQL 技能还带查询核对清单。首次启动注册为版本化包；已有后台版本不会被重启覆盖。更新已有技能可下载包、修改并从该技能上传新版本。
+内置技能位于 `skills/`，包含 `knowledge`、`sql`、`evidence-review`、`visualize`。每份都是标准 `SKILL.md` 目录，文档与 SQL 技能带按需读取的证据/查询核对清单。首次启动注册为版本化包；已有后台版本不会被重启覆盖。更新已有技能可下载包、修改并从该技能上传新版本。
 
 ## 预算随模型资料变化
 
@@ -30,7 +30,7 @@ SummarizationMiddleware(
 | `CHAT_MAX_STEPS` | 512 图步骤 |
 | `CHAT_MODEL_CALL_LIMIT` | 每轮 64 次逻辑模型调用 |
 | `CHAT_TOOL_CALL_LIMIT` | 每轮 128 次逻辑工具调用 |
-| `CHAT_TIMEOUT_SECONDS` | 每轮 900 秒 |
+| `CHAT_TIMEOUT_SECONDS` | 每轮实际执行 900 秒，排队等待不计入 |
 | `CHAT_MODEL_TIMEOUT_SECONDS` | 模型请求及流片段等待预算 180 秒 |
 | `CHAT_MAX_OUTPUT_TOKENS` | 0，自动跟随 Profile 输出上限 |
 | `CHAT_SUMMARY_TRIGGER_FRACTION` | 0.75 |
@@ -120,7 +120,7 @@ ZIP 可直接包含文件，也可包含一个与 name 相同的顶层目录。�
 
 ## 已验证
 
-- 80 项后端测试通过，包括删除恢复与内置来源保护、ZIP 边界、权限、修订冲突、老版本资源固定、显式技能注入、关闭工具不可绕过、比例预算与剩余输出空间，以及原有数据库/检索/访问控制回归。
+- 后端回归通过，包括删除恢复与内置来源保护、ZIP 边界、权限、修订冲突、老版本资源固定、显式技能注入、关闭工具不可绕过、比例预算与剩余输出空间，以及原有数据库/检索/访问控制回归。
 - 前端类型检查、ESLint 和生产构建通过。
 - 页面实际上传了 `report-template.zip`，识别为 3 个文件、版本 1、来源“已上传”。
 - 页面实际验证目录展开收起、切换文件时弹窗等宽等高、上传技能删除恢复与内置技能菜单保护。

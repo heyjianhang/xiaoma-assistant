@@ -118,6 +118,8 @@ async def test_expired_lease_and_cancelled_attempt_are_fenced(api):
                 lease_until=utcnow() - timedelta(seconds=1),
             )
         )
+    async with db.engine.begin() as conn:
+        await db.queue.renew(conn, "ingestion", stale["queue_message_id"], 0)
     current = await service.claim()
     assert current["index_id"] != stale["index_id"]
     with pytest.raises(IngestionError, match="取消或接管"):

@@ -14,6 +14,7 @@
 | 自动选工具 | LangChain `create_agent` 按问题选择 RAG、SQL 或组合查询；前端开关限定本轮允许的工具 |
 | 结果展示 | 实际查询结果驱动表格、图表和指标卡；核对与澄清工具的结构化参数映射到 React 组件 |
 | 流式过程 | SSE 推送文本、真实工具状态、引用和原生 TodoList；上下文总结和首条消息生成标题 |
+| 后台任务 | PGMQ分别调度聊天与解析，多会话并发、断线补读与显式停止；关闭页面不取消 |
 | Skill | 标准 Skill ZIP 上传、版本管理、按需读取与 `/` 选择 |
 | 访问控制 | 管理员密码登录；邀请带有效期，首次兑换绑定浏览器；聊天按认证身份隔离 |
 
@@ -53,6 +54,7 @@ MINERU_API_KEY=your-mineru-key
 
 ```bash
 docker compose up -d --wait postgres
+uv run --project apps/api python scripts/init_queue.py
 uv run --project apps/api python scripts/import_business.py
 uv run --project apps/api python scripts/init_access.py
 sh scripts/dev.sh
@@ -65,6 +67,7 @@ pnpm --dir apps/web dev
 ```
 
 - 助手：<http://127.0.0.1:3002/chat>
+- 项目介绍：<http://127.0.0.1:3002/project>，展示整体架构、数据集、记忆与上下文，以及 RAG、Text2SQL、证据核对的交互式说明。
 - 管理入口：<http://127.0.0.1:3002/admin>。初始密码保存在本机 `var/admin-credentials.json`（0600），不提交。
 - API 契约：<http://127.0.0.1:2025/api/docs>；健康检查：`GET /api/health`。
 
@@ -96,7 +99,7 @@ make check-web
 python3 scripts/check_repository.py
 ```
 
-后端集成测试需要上述 PostgreSQL 和导入的业务表，使用随机独立测试 Schema，不清空应用数据。可控模型/HTTP 测试验证代码契约，不能代替生成效果评测。[CI](.github/workflows/ci.yml) 在独立数据库中执行同样检查；远端 CI 尚未运行。
+后端集成测试需要上述 PostgreSQL 和导入的业务表，使用随机独立测试 Schema，不清空应用数据。可控模型/HTTP 测试验证代码契约，不能代替生成效果评测。[CI](.github/workflows/ci.yml) 在独立数据库中执行同样检查；远端状态以 GitHub Actions 为准。
 
 通过 [调试 CLI](docs/debug-cli.md) 经正式认证接口发送消息，查看提示词快照、工具与结果：
 
@@ -114,6 +117,7 @@ sh scripts/xiaoma.sh inspect RUN_ID
 - [运行参数与容错](docs/agent-runtime.md)：Model Profile、压缩预算、调用限额和重试。
 - [Agent 与访问控制](docs/agent-and-access.md)：工具、Skill、邀请和隔离。
 - [文档入库](docs/ingestion.md)：结构完整性、来源坐标、任务租约和索引发布。
+- [后台任务与断线恢复](docs/background-jobs.md)：PGMQ、Worker、事件序号和并发控制。
 - [部署说明](docs/deployment.md)：HTTPS、持久化和同源代理。
 - [第三方声明](THIRD_PARTY_NOTICES.md)：AI Elements / shadcn 来源与许可。
 

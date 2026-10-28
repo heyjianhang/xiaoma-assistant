@@ -1,62 +1,442 @@
 {
-  "schema_version": 1,
-  "description": "人工或真实模型验收清单。预期不进入知识库或Agent上下文；并非自动判分结果。",
+  "schema_version": 2,
+  "description": "固定人工/真实模型验收用例。前端可查看预期，仅发送question字段；预期、检查项不进入Agent上下文或知识库。未标记为模型已通过。",
   "time_window": "2026-09-01T00:00:00+08:00 <= paid_at < 2026-10-01T00:00:00+08:00；退款完成截止2026-10-01T00:00:00+08:00之前",
   "cases": [
     {
-      "id": "A01", "category": "rag",
-      "question": "电子钱包退款，新旧制度分别要求多久？按什么时间选择版本？",
-      "required_documents": ["refund-policy-v1.pdf", "refund-policy-v2.pdf"],
+      "id": "A01",
+      "category": "rag",
+      "question": "电子钱包退款，新旧制度分别要求多久？按什么时间选择版本？请说明计时公式并引用条款。",
+      "required_documents": [
+        "refund-policy-v1.pdf",
+        "refund-policy-v2.pdf"
+      ],
       "expected_route": "RAG",
-      "checks": ["实际检索两版制度", "旧版48自然小时，新版24自然小时", "按applied_at选择版本，分界为2026-09-01", "说明验收后到成功到账的计时口径", "引用文档及对应条款，可打开原文"]
+      "checks": [
+        "实际检索两版制度",
+        "旧版48自然小时，新版24自然小时",
+        "按applied_at选择版本，分界为2026-09-01",
+        "说明验收后到成功到账的计时口径",
+        "引用文档及对应条款，可打开原文"
+      ],
+      "group": "文档问答",
+      "label": "退款制度",
+      "components": [
+        "原文引用",
+        "Markdown表格与公式"
+      ],
+      "expected_answer": "旧版验收后最长 **48 自然小时**，新版最长 **24 自然小时**。\n\n按申请时间 applied_at 选版本：2026-09-01 00:00:00+08:00 起提交的适用新版，之前仍用旧版。\n\n到账时长 = (completed_at − accepted_at) / 1小时。等于上限按时，大于上限才超时；跨生效日完成不改变版本。",
+      "reference": [
+        "AS1-1.2 / AS1-T2",
+        "AS2-1.2 / AS2-T2 / AS2-F1"
+      ]
     },
     {
-      "id": "A02", "category": "sql",
+      "id": "A10",
+      "category": "rag",
+      "required_documents": [
+        "supplier-admission.pdf"
+      ],
+      "expected_route": "RAG",
+      "group": "文档问答",
+      "label": "审批流程",
+      "question": "供应商准入流程第3步由谁审核？需要哪些材料，审核通过后能直接标记已准入吗？",
+      "components": [
+        "原文引用",
+        "Markdown表格"
+      ],
+      "expected_answer": "第3步是**合同审核**，由**法务 / 采购经理**负责。核验采购合同、售后责任边界、结算与退货安排，确认合同主体与资质主体一致。\n\n第3步不等于最终批准；第4步由采购负责人批准归档后，再由管理员将主数据标记为 approved。",
+      "checks": [
+        "从表SUP-T1准确关联步骤、角色和材料列。",
+        "不把合同审核与最终批准混为一谈。",
+        "引用能定位到准入流程表。"
+      ],
+      "reference": [
+        "SUP-T1 / SUP-1.1 / SUP-1.2"
+      ]
+    },
+    {
+      "id": "A09",
+      "category": "rag",
+      "question": "生鲜供应商准入材料续页清单第19项是什么，由谁核验？这项协商能延长客户退款时限吗？",
+      "required_documents": [
+        "supplier-admission.pdf"
+      ],
+      "expected_route": "RAG",
+      "checks": [
+        "从续页找到第19行，并保留列标题和责任角色。",
+        "未召回该行时明确缺证，不猜测。",
+        "引用能定位表SUP-T2对应页。"
+      ],
+      "group": "文档问答",
+      "label": "续页表格",
+      "components": [
+        "原文引用",
+        "续页表格"
+      ],
+      "expected_answer": "第19项是**渠道到账配合**，由**财务**核验。供应商争议协商不能延长已验收客户退款的渠道时限。",
+      "reference": [
+        "SUP-2.1 / SUP-T2 第19项"
+      ]
+    },
+    {
+      "id": "A02",
+      "category": "sql",
       "question": "查询全部订单总数，不限制日期。",
-      "required_documents": [], "expected_route": "SQL",
-      "checks": ["list_tables后查看候选表，再link_schema，最后execute_readonly_sql", "订单总数为5000", "使用只读连接实际执行", "自然语言摘要与结果一致", "不擅自增加日期限制"]
+      "required_documents": [],
+      "expected_route": "SQL",
+      "checks": [
+        "list_tables后查看候选表，再link_schema，最后execute_readonly_sql",
+        "订单总数为5000",
+        "使用只读连接实际执行",
+        "自然语言摘要与结果一致",
+        "不擅自增加日期限制"
+      ],
+      "group": "数据查询",
+      "label": "订单总数",
+      "components": [
+        "查询结果表",
+        "SQL详情",
+        "选表与字段"
+      ],
+      "expected_answer": "全部订单总数为 **5,000 单**。按订单头的 order_id 去重，包含未支付和取消订单；不附加日期、支付或退款筛选。",
+      "reference": [
+        "固定演示库 orders 全量计数"
+      ]
     },
     {
-      "id": "A03", "category": "sql",
-      "question": "按全部订单的订单状态统计数量并画柱状图，不限制日期，核对合计。",
-      "required_documents": [], "expected_route": "SQL",
-      "checks": ["显式Schema Linking后实际执行", "fulfilled=4066、paid=735、created=107、cancelled=92，合计5000", "render_chart引用本轮真实result_id", "图表与摘要的数值一致"]
+      "id": "A11",
+      "category": "sql",
+      "required_documents": [
+        "metric-definitions.pdf"
+      ],
+      "expected_route": "HYBRID",
+      "group": "数据查询",
+      "label": "退款率排名",
+      "question": "按运营指标定义，查询2026年9月华东区订单退款率最高的三个品类。成功退款观察截至2026年10月1日之前，同时给出去重支付订单数和退款订单数。",
+      "components": [
+        "查询结果表",
+        "SQL详情",
+        "选表与字段"
+      ],
+      "expected_answer": "| 品类 | 退款订单 / 支付订单 | 退款率 |\n| --- | --- | --- |\n| 生鲜果蔬 | 8 / 100 | 8.00% |\n| 休闲零食 | 7 / 182 | 3.85% |\n| 滋补礼盒 | 5 / 167 | 2.99% |\n\n按收货地区和成交品类快照统计。分子沿成功退款行回到原购买行；分子分母都按订单去重。",
+      "checks": [
+        "读取口径，逐步查看并链接订单、购买行、退款头、退款行及维度。",
+        "支付窗口左闭右开，退款完成时间严格早于截止。",
+        "不能用退款单数或JOIN行数代替退款订单数；输出前三名和分子分母。"
+      ],
+      "reference": [
+        "MET-F1 / MET-1.2 / MET-2.1",
+        "只读PostgreSQL已核验：8/100、7/182、5/167"
+      ]
     },
     {
-      "id": "A04", "category": "hybrid",
-      "question": "订单110有申请和到账时间，能否判断退款是否超时？请查制度和实际记录。",
-      "required_documents": ["refund-policy-v2.pdf"], "expected_route": "HYBRID",
-      "checks": ["同时实际检索制度与执行SQL", "识别accepted_at为空", "明确无法判定，不用applied_at或其他时间补填", "展示记录与制度依据"]
+      "id": "A17",
+      "category": "sql",
+      "required_documents": [
+        "fulfillment-standard.pdf"
+      ],
+      "expected_route": "HYBRID",
+      "group": "数据查询",
+      "label": "高额延迟",
+      "question": "按履约规范，2026年9月单笔实付金额超过500元的支付订单，截止2026年10月1日之前的延迟发货占比是多少？截止仍未发货的订单如何计入？",
+      "components": [
+        "查询结果表",
+        "原文引用",
+        "SQL详情"
+      ],
+      "expected_answer": "符合范围且承诺时刻早于截止的订单 **77 单**，延迟 **34 单**，占比 **44.16%**。\n\n实际发货晚于承诺，或截止仍未发货，都算延迟；正好在承诺时刻发货不算延迟。这里筛选的是单笔订单实付金额大于500元。",
+      "checks": [
+        "读取FUL-2.1/FUL-F1，显式链接支付、承诺与实际发货时间。",
+        "按去重订单统计，不能随订单明细重复计算。",
+        "展示34/77及44.16%，说明未发货和相等边界。"
+      ],
+      "reference": [
+        "FUL-2.1 / FUL-F1",
+        "只读PostgreSQL已核验：34/77=44.16%"
+      ]
     },
     {
-      "id": "A05", "category": "ambiguity",
-      "question": "请计算2026年9月的售后异常率。",
-      "required_documents": ["metric-definitions.pdf"], "expected_route": "RAG/澄清",
-      "checks": ["检查现有指标定义", "指出售后异常率未定义", "询问分子、分母与范围，或提供明确标注的候选指标", "不自动替换成退款率并执行计算"]
-    },
-    {
-      "id": "A06", "category": "conflict",
+      "id": "A06",
+      "category": "conflict",
       "question": "2026年9月华东生鲜的订单退款率是多少？月报写的数值是否一致？",
-      "required_documents": ["metric-definitions.pdf", "monthly-report.pdf"], "expected_route": "HYBRID",
-      "checks": ["同时读取月报、口径和实际业务数据", "先对齐时间、地区、品类、订单粒度与截止时间", "数据库100支付订单、8成功退款订单，8%", "月报2%，同时呈现，不静默采用一方", "指出差6个百分点，区分退款单数与去重退款订单数", "文档引用与SQL结果都能追溯"]
+      "required_documents": [
+        "metric-definitions.pdf",
+        "monthly-report.pdf"
+      ],
+      "expected_route": "HYBRID",
+      "checks": [
+        "同时读取月报、口径和实际业务数据",
+        "先对齐时间、地区、品类、订单粒度与截止时间",
+        "数据库100支付订单、8成功退款订单，8%",
+        "月报2%，同时呈现，不静默采用一方",
+        "指出差6个百分点，区分退款单数与去重退款订单数",
+        "文档引用与SQL结果都能追溯",
+        "复杂核对展示真实工具阶段和任务状态，结束自动收起；刷新/切换后保留结果与引用。"
+      ],
+      "group": "综合核对",
+      "label": "月报冲突",
+      "components": [
+        "冲突核对卡",
+        "原文引用",
+        "数据与SQL",
+        "任务条",
+        "处理过程"
+      ],
+      "expected_answer": "数据库为 **8 / 100 = 8%**，月报写 **2%**，相差 **6 个百分点**。\n\n对齐时间、地区、品类和订单粒度后仍不一致，应并列两份来源并标注冲突。数据库的10张成功退款单对应8个去重退款订单，不能混用。没有证据时不能断言是录入错误或延迟。",
+      "reference": [
+        "REP-1.1 / REP-T1 / REP-2.1",
+        "MET-F1 / MET-2.1 / MET-4.1",
+        "固定场景：100支付订单、8退款订单、10退款单"
+      ]
     },
     {
-      "id": "A07", "category": "anomaly",
+      "id": "A12",
+      "category": "hybrid",
+      "required_documents": [
+        "refund-policy-v1.pdf",
+        "refund-policy-v2.pdf"
+      ],
+      "expected_route": "HYBRID",
+      "group": "综合核对",
+      "label": "跨版时效",
+      "question": "查询订单104的退款记录。它在新版生效后完成退款，是否应按新版24小时判为超时？请结合制度判断。",
+      "components": [
+        "证据核对卡",
+        "原文引用",
+        "数据与SQL"
+      ],
+      "expected_answer": "**不应套用新版，适用旧版，实际按时。**\n\n申请于2026-08-31 23:00提交，早于新版生效；9月1日10:00验收，9月3日10:00完成，实际 **48 自然小时**，等于旧版电子钱包上限。按 applied_at 选版本，不按完成日期。",
+      "checks": [
+        "实际检索新旧制度并查询订单104。",
+        "核对卡展示旧版1.0、48小时上限、48小时实际耗时。",
+        "区分版本适用与执行偏差，不回溯套新版。"
+      ],
+      "reference": [
+        "AS1-1.2 / AS1-T2 / AS2-1.2",
+        "退款记录 TK202609000014"
+      ]
+    },
+    {
+      "id": "A04",
+      "category": "hybrid",
+      "question": "订单110有申请和到账时间，能否判断退款是否超时？请查制度和实际记录，不要用申请时间替代验收时间。",
+      "required_documents": [
+        "refund-policy-v2.pdf"
+      ],
+      "expected_route": "HYBRID",
+      "checks": [
+        "同时实际检索制度与执行SQL",
+        "识别accepted_at为空",
+        "明确无法判定，不用applied_at或其他时间补填",
+        "展示记录与制度依据"
+      ],
+      "group": "综合核对",
+      "label": "缺失验收",
+      "components": [
+        "缺失核对卡",
+        "原文引用",
+        "数据与SQL"
+      ],
+      "expected_answer": "**无法判定到账是否超时。**订单110是电子钱包成功退款，适用新版24小时，但 accepted_at 为 **NULL**。\n\n9月15日10:00申请，9月18日10:00到账，两者的72小时不能当作验收后到账时长。需要有原始凭证的验收时间。",
+      "reference": [
+        "AS2-3.1 / AS2-3.3 / AS2-T2",
+        "退款记录 TK202609000020"
+      ]
+    },
+    {
+      "id": "A05",
+      "category": "ambiguity",
+      "question": "请计算2026年9月的售后异常率。",
+      "required_documents": [
+        "metric-definitions.pdf"
+      ],
+      "expected_route": "RAG/澄清",
+      "checks": [
+        "检查现有指标定义",
+        "指出售后异常率未定义",
+        "询问分子、分母与范围，或提供明确标注的候选指标",
+        "不自动替换成退款率并执行计算"
+      ],
+      "group": "异常澄清",
+      "label": "口径澄清",
+      "components": [
+        "澄清选项卡",
+        "原文引用"
+      ],
+      "expected_answer": "指标说明没有定义“售后异常率”，不能自行替换为订单退款率。应确认异常事件、分子、分母、时间与去重方式。\n\n可提供“成功退款订单率”“延迟发货占比”等已有定义的候选指标供选择；选择前不能计算并命名为售后异常率。",
+      "reference": [
+        "MET-4.2 / MET-F1 / MET-F4"
+      ]
+    },
+    {
+      "id": "A07",
+      "category": "anomaly",
       "question": "2026年9月西北滋补礼盒退款率100%，是否说明该品类普遍有问题？",
-      "required_documents": ["metric-definitions.pdf"], "expected_route": "HYBRID",
-      "checks": ["查询得到3个支付订单、3个成功退款订单", "展示100%的分子分母和小样本提示", "不外推普遍品质问题或因果结论"]
+      "required_documents": [
+        "metric-definitions.pdf"
+      ],
+      "expected_route": "HYBRID",
+      "checks": [
+        "查询得到3个支付订单、3个成功退款订单",
+        "展示100%的分子分母和小样本提示",
+        "不外推普遍品质问题或因果结论"
+      ],
+      "group": "异常澄清",
+      "label": "小样本",
+      "components": [
+        "小样本核对卡",
+        "原文引用",
+        "数据与SQL"
+      ],
+      "expected_answer": "实际为 **3 个成功退款订单 / 3 个支付订单 = 100%**。\n\n样本量只有3，不足以外推该品类普遍有质量问题，也不能据此判定供应商责任。显示小样本提示，建议扩大观察范围、补充批次和质量证据。",
+      "reference": [
+        "MET-T1 / MET-F1",
+        "固定场景：西北滋补礼盒3/3"
+      ]
     },
     {
-      "id": "A08", "category": "ambiguity",
-      "question": "生鲜品类退款率高，是因为政策太宽松还是数据异常？",
-      "required_documents": ["refund-policy-v2.pdf", "metric-definitions.pdf"], "expected_route": "澄清/随后HYBRID",
-      "checks": ["先明确时间、地区、指标和比较基准，或明确说明采用的范围", "如继续分析，分别检索政策和实际查询数据", "检查样本量、重复JOIN与缺失", "不将相关性当作政策导致退款的因果证明"]
+      "id": "A13",
+      "category": "anomaly",
+      "required_documents": [
+        "metric-definitions.pdf"
+      ],
+      "expected_route": "HYBRID",
+      "group": "异常澄清",
+      "label": "零分母",
+      "question": "查询2026年9月东北茗茶饮品的订单退款率，同时显示支付订单数、成功退款订单数。",
+      "components": [
+        "查询结果表",
+        "边界说明",
+        "SQL详情"
+      ],
+      "expected_answer": "支付订单 **0**，成功退款订单 **0**，退款率 **未定义 / NULL**，不能显示成0%或100%。\n\n该范围有未支付订单，不能计入支付分母；不能制造空范围的排名。",
+      "checks": [
+        "实际执行查询，区分无支付订单和无任何订单。",
+        "分母0时返回NULL并说明，不发生除零错误。",
+        "组件保留空值占位，不格式化为0%。"
+      ],
+      "reference": [
+        "MET-F1 / MET-1.3 / MET-5.2",
+        "固定场景：东北茗茶饮品0/0"
+      ]
     },
     {
-      "id": "A09", "category": "rag",
-      "question": "生鲜供应商准入续页清单第19项是什么，由谁核验？",
-      "required_documents": ["supplier-admission.pdf"], "expected_route": "RAG",
-      "checks": ["实际检索续页表格与列标题", "答案依据原文第19项及核验责任列", "引用能定位到对应文档、条款/表格与页", "未召回该行时明确证据不足，不猜测"]
+      "id": "A14",
+      "category": "sql",
+      "required_documents": [
+        "metric-definitions.pdf"
+      ],
+      "expected_route": "HYBRID",
+      "group": "ChatBI",
+      "label": "经营指标",
+      "question": "用指标卡展示2026年9月支付订单数、实付金额、客单价，以及这些支付订单截至2026年10月1日之前的成功退款金额。实付金额不扣退款。",
+      "components": [
+        "指标卡",
+        "数据表",
+        "SQL详情"
+      ],
+      "expected_answer": "| 指标 | 预期值 |\n| --- | --- |\n| 支付订单数 | 1,615 单 |\n| 实付金额 | 381,420.00 元 |\n| 客单价 | 236.17 元 |\n| 成功退款金额 | 4,228.00 元 |\n\n退款限定为**9月支付订单队列**，截至10月1日前完成：122张成功退款单、120个去重退款订单。不能改为9月到账的全部历史订单；后者是4,264元。",
+      "checks": [
+        "用本轮实际result_id调用render_chart的metrics模式，中文标签与金额单位清楚。",
+        "订单金额不能与购买行JOIN后重复求和，退款口径与支付队列一致。",
+        "概览、数据、SQL可切换；卡片先展示，后续说明追加在下方。"
+      ],
+      "reference": [
+        "MET-F2 / MET-F3 / MET-5.1",
+        "只读PostgreSQL已核验四项数值"
+      ]
+    },
+    {
+      "id": "A03",
+      "category": "sql",
+      "question": "按全部订单的订单状态统计数量并画柱状图，不限制日期，核对合计。",
+      "required_documents": [],
+      "expected_route": "SQL",
+      "checks": [
+        "显式Schema Linking后实际执行",
+        "fulfilled=4066、paid=735、created=107、cancelled=92，合计5000",
+        "render_chart引用本轮真实result_id",
+        "图表与摘要的数值一致",
+        "柱状图、数据和SQL可切换；坐标、图例、摘要与真实结果一致。"
+      ],
+      "group": "ChatBI",
+      "label": "状态柱图",
+      "components": [
+        "柱状图",
+        "数据表",
+        "SQL详情"
+      ],
+      "expected_answer": "| 状态 | 数量 |\n| --- | --- |\n| fulfilled（已签收） | 4,066 |\n| paid（已支付待发货） | 735 |\n| created（待支付） | 107 |\n| cancelled（未支付取消） | 92 |\n\n合计 **5,000 单**。当前没有 shipped 状态订单，可省略或标0，不能编造有值的柱。",
+      "reference": [
+        "固定演示库 orders 全量状态分组"
+      ]
+    },
+    {
+      "id": "A15",
+      "category": "sql",
+      "required_documents": [],
+      "expected_route": "SQL",
+      "group": "ChatBI",
+      "label": "支付趋势",
+      "question": "用折线图展示2026年9月每日支付订单数，按北京时间支付日期归组，补齐9月1日至30日，没有支付的日期填0。",
+      "components": [
+        "折线图",
+        "数据表",
+        "SQL详情"
+      ],
+      "expected_answer": "共 **30 个日期点**，订单总和 **1,615 单**。\n\n9月1日 **88 单**，9月2日 **69 单**，9月20日 **81 单**；9月21日至30日均为 **0 单**。日期升序，不能按创建日或退款完成日归组。",
+      "checks": [
+        "查看并链接paid_at和order_id，按Asia/Shanghai支付日期分组。",
+        "render_chart引用本轮result_id，view=line，数量轴不混入不同单位。",
+        "补齐30天并核对合计；曲线、数据和SQL一致。"
+      ],
+      "reference": [
+        "只读PostgreSQL已核验：20个有支付日期，补齐后30天，合计1615"
+      ]
+    },
+    {
+      "id": "A16",
+      "category": "sql",
+      "required_documents": [],
+      "expected_route": "SQL",
+      "group": "ChatBI",
+      "label": "商品明细",
+      "question": "用数据表展示2026年9月实付金额前十的商品及供应商，包含商品名、供应商、支付件数和实付金额。不要使用商品当前标价。",
+      "components": [
+        "数据表",
+        "SQL详情",
+        "选表与字段"
+      ],
+      "expected_answer": "共 **10 行**，按历史购买行实付金额降序。前三名：\n\n| 商品 | 供应商 | 件数 | 实付金额（元） |\n| --- | --- | --- | --- |\n| 禾序养生礼盒 | 锦穗滋养食品社（虚构） | 410 | 40,180.00 |\n| 松溪山珍礼盒 | 锦穗滋养食品社（虚构） | 391 | 34,408.00 |\n| 青岚红枣礼盒 | 锦穗滋养食品社（虚构） | 437 | 25,346.00 |\n\n第10名为青岚乌龙100克，325件、13,650.00元。供应商名称是主数据关联，不表示退款质量责任。",
+      "checks": [
+        "逐步查看并链接orders、order_items、products和suppliers。",
+        "汇总历史明细paid_amount，不用当前标价替代。",
+        "render_chart使用table模式；长表横向滚动，中文列名和SQL详情可查看。"
+      ],
+      "reference": [
+        "只读PostgreSQL已核验10行，首位40180.00元、末位13650.00元"
+      ]
     }
-  ]
+  ],
+  "groups": [
+    "文档问答",
+    "数据查询",
+    "综合核对",
+    "异常澄清",
+    "ChatBI"
+  ],
+  "setup": [
+    "每题使用新对话，知识库和业务数据两组工具均开启，让Agent自动选择路径。",
+    "导入固定演示库；上传该题所需PDF或对应Markdown，等待可检索。",
+    "核对业务结论、实际证据和组件行为，不要求逐字复述参考答案。"
+  ],
+  "document_titles": {
+    "refund-policy-v1.pdf": "售后退款制度（旧版）",
+    "refund-policy-v2.pdf": "售后退款制度（新版）",
+    "supplier-admission.pdf": "供应商准入流程",
+    "metric-definitions.pdf": "运营指标口径说明",
+    "monthly-report.pdf": "2026年9月运营月报",
+    "fulfillment-standard.pdf": "订单履约与服务规范"
+  }
 }

@@ -1,0 +1,5927 @@
+{
+  "chunker_version": "structure-v1",
+  "samples": [
+    {
+      "id": "refund",
+      "title": "退款制度节选",
+      "blocks": [
+        {
+          "id": "md:0:1",
+          "kind": "heading",
+          "markdown": "# 售后退款处理说明",
+          "level": 1,
+          "source_refs": [
+            {
+              "kind": "markdown_lines",
+              "line_start": 1,
+              "line_end": 1
+            }
+          ]
+        },
+        {
+          "id": "md:2:3",
+          "kind": "text",
+          "markdown": "以下为切块演示节选，围绕材料验收、渠道到账和异常核对组织内容。表格和公式后面的附注属于解释口径，检索时应保留完整。",
+          "level": 0,
+          "source_refs": [
+            {
+              "kind": "markdown_lines",
+              "line_start": 3,
+              "line_end": 3
+            }
+          ]
+        },
+        {
+          "id": "md:4:5",
+          "kind": "heading",
+          "markdown": "## 1 申请与验收",
+          "level": 2,
+          "source_refs": [
+            {
+              "kind": "markdown_lines",
+              "line_start": 5,
+              "line_end": 5
+            }
+          ]
+        },
+        {
+          "id": "md:6:7",
+          "kind": "text",
+          "markdown": "退款申请提交后，客服核对原购买明细、支付渠道与申请数量。仅退款场景核验照片和签收凭证；退货退款场景还需要核对实物、包装与仓库交接记录。",
+          "level": 0,
+          "source_refs": [
+            {
+              "kind": "markdown_lines",
+              "line_start": 7,
+              "line_end": 7
+            }
+          ]
+        },
+        {
+          "id": "md:8:9",
+          "kind": "text",
+          "markdown": "验收时间记录材料完整并审核通过的业务时刻。申请提交、商品发货和客户签收分别代表不同事件，不能替代售后验收时间。",
+          "level": 0,
+          "source_refs": [
+            {
+              "kind": "markdown_lines",
+              "line_start": 9,
+              "line_end": 9
+            }
+          ]
+        },
+        {
+          "id": "md:10:11",
+          "kind": "heading",
+          "markdown": "## 2 支付渠道到账时限",
+          "level": 2,
+          "source_refs": [
+            {
+              "kind": "markdown_lines",
+              "line_start": 11,
+              "line_end": 11
+            }
+          ]
+        },
+        {
+          "id": "md:12:13",
+          "kind": "text",
+          "markdown": "以下时限适用于新版制度受理的退款申请，从验收通过后开始连续计时。",
+          "level": 0,
+          "source_refs": [
+            {
+              "kind": "markdown_lines",
+              "line_start": 13,
+              "line_end": 13
+            }
+          ]
+        },
+        {
+          "id": "md:14:18",
+          "kind": "table",
+          "markdown": "| 原支付渠道 | 验收后最长期限 | 责任与计时说明 |\n| --- | --- | --- |\n| 电子钱包 wallet | 24 自然小时 | 从售后验收通过到支付渠道确认成功到账连续计时，周末与节假日不顺延。客服核验渠道回执，财务跟踪在途差错。 |\n| 银行卡 bank | 48 自然小时 | 原路退回原支付账户；银行处理期间仍然纳入到账时长，超过期限时应升级处理，并保留银行回执及沟通记录。 |\n\n注1：到达期限的同一时刻完成视为按时，只有实际耗时大于期限才判定超时。表格中的时限不包含申请后等待受理、补充材料和验收前的等待阶段。\n\n注2：缺少验收时间或成功到账时间时，不能用申请、发货、签收或更新时间补算已完成退款时长。应保留原记录并登记补录责任人。",
+          "level": 0,
+          "source_refs": [
+            {
+              "kind": "markdown_lines",
+              "line_start": 15,
+              "line_end": 18
+            },
+            {
+              "kind": "markdown_lines",
+              "line_start": 20,
+              "line_end": 20
+            },
+            {
+              "kind": "markdown_lines",
+              "line_start": 22,
+              "line_end": 22
+            }
+          ]
+        },
+        {
+          "id": "md:23:24",
+          "kind": "heading",
+          "markdown": "## 3 到账时长计算",
+          "level": 2,
+          "source_refs": [
+            {
+              "kind": "markdown_lines",
+              "line_start": 24,
+              "line_end": 24
+            }
+          ]
+        },
+        {
+          "id": "md:25:26",
+          "kind": "text",
+          "markdown": "到账时长统一换算成自然小时，比较时保留原始时间精度。",
+          "level": 0,
+          "source_refs": [
+            {
+              "kind": "markdown_lines",
+              "line_start": 26,
+              "line_end": 26
+            }
+          ]
+        },
+        {
+          "id": "md:27:30",
+          "kind": "equation",
+          "markdown": "$$\nH = \\frac{T_{\\mathrm{completed}} - T_{\\mathrm{accepted}}}{3600}\n$$\n\n式中，两个时间变量使用秒级时间戳，H 为自然小时数；T_completed 对应支付渠道确认成功到账的时刻，T_accepted 对应售后验收通过的时刻。H 大于适用渠道上限判为超时，等于上限判为按时。",
+          "level": 0,
+          "source_refs": [
+            {
+              "kind": "markdown_lines",
+              "line_start": 28,
+              "line_end": 30
+            },
+            {
+              "kind": "markdown_lines",
+              "line_start": 32,
+              "line_end": 32
+            }
+          ]
+        },
+        {
+          "id": "md:33:34",
+          "kind": "heading",
+          "markdown": "## 4 异常核对",
+          "level": 2,
+          "source_refs": [
+            {
+              "kind": "markdown_lines",
+              "line_start": 34,
+              "line_end": 34
+            }
+          ]
+        },
+        {
+          "id": "md:35:36",
+          "kind": "text",
+          "markdown": "成功退款记录缺少验收时间时，应标记“无法判定”，不能只根据申请到完成相隔的天数判断违规。",
+          "level": 0,
+          "source_refs": [
+            {
+              "kind": "markdown_lines",
+              "line_start": 36,
+              "line_end": 36
+            }
+          ]
+        },
+        {
+          "id": "md:37:38",
+          "kind": "text",
+          "markdown": "同一订单可能多次部分退款。统计退款订单率时按订单去重；统计退款单数量和退款金额时使用对应的退款记录，避免因关联明细重复累计。",
+          "level": 0,
+          "source_refs": [
+            {
+              "kind": "markdown_lines",
+              "line_start": 38,
+              "line_end": 38
+            }
+          ]
+        }
+      ],
+      "cases": [
+        {
+          "options": {
+            "target_chars": 180,
+            "max_chars": 180,
+            "min_chars": 0
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 150,
+              "sha256": "3202cee2831635092511370f0e8edd69cbf6fb40741730b1a1316814c46c31e7"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:8:9",
+                "md:10:11",
+                "md:12:13"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "1 申请与验收"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 104,
+              "sha256": "1508d1485a06fc01aa41393fe701b5cdca42e991b287bd93d93063fd4cf1581f"
+            },
+            {
+              "sequence": 3,
+              "block_ids": [
+                "md:14:18"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "2 支付渠道到账时限"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                }
+              ],
+              "oversized_atom": true,
+              "characters": 333,
+              "sha256": "cf3233795360b4be4a9a7d8a2d8fea8e85627e34696a6f9bb4c753f0020a8808"
+            },
+            {
+              "sequence": 4,
+              "block_ids": [
+                "md:23:24",
+                "md:25:26"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "3 到账时长计算"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 39,
+              "sha256": "1a802ad34cdf13031a9510187474f6fe06f7d6f573a4c8c8d4d95a79667a0047"
+            },
+            {
+              "sequence": 5,
+              "block_ids": [
+                "md:27:30"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "3 到账时长计算"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 172,
+              "sha256": "828f39bf0bf46ea741dba261d3abc143167143714f1040f4fab49c20adfd4307"
+            },
+            {
+              "sequence": 6,
+              "block_ids": [
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "4 异常核对"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 119,
+              "sha256": "3d96b693cc347772f0abcabc46bf5f8568d3c19be999c64145b3a5cd73ec6463"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 180,
+            "max_chars": 360,
+            "min_chars": 0
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7",
+                "md:8:9"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 207,
+              "sha256": "e33b132fc0ce13bdfe885914c1f78a9bab7f9317573db420bf4aafd2752c90f0"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:10:11",
+                "md:12:13"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "2 支付渠道到账时限"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 47,
+              "sha256": "678ccf930f29d2e9ac317eeccb4bec4d20c2b80d04e4baa77b2331e36d072164"
+            },
+            {
+              "sequence": 3,
+              "block_ids": [
+                "md:14:18"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "2 支付渠道到账时限"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 333,
+              "sha256": "cf3233795360b4be4a9a7d8a2d8fea8e85627e34696a6f9bb4c753f0020a8808"
+            },
+            {
+              "sequence": 4,
+              "block_ids": [
+                "md:23:24",
+                "md:25:26",
+                "md:27:30"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "3 到账时长计算"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 213,
+              "sha256": "07abbbd02f1dcb8e2efd5fb5483f09e3b005a2a2dd20c5471dcd29581fe4fb5f"
+            },
+            {
+              "sequence": 5,
+              "block_ids": [
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "4 异常核对"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 119,
+              "sha256": "3d96b693cc347772f0abcabc46bf5f8568d3c19be999c64145b3a5cd73ec6463"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 180,
+            "max_chars": 720,
+            "min_chars": 0
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7",
+                "md:8:9"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 207,
+              "sha256": "e33b132fc0ce13bdfe885914c1f78a9bab7f9317573db420bf4aafd2752c90f0"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:10:11",
+                "md:12:13",
+                "md:14:18"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "2 支付渠道到账时限"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 382,
+              "sha256": "d701ee673f0f73db7d6bdcaa3aa471c7ecfb518e79c46040fc583fa13f49124e"
+            },
+            {
+              "sequence": 3,
+              "block_ids": [
+                "md:23:24",
+                "md:25:26",
+                "md:27:30"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "3 到账时长计算"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 213,
+              "sha256": "07abbbd02f1dcb8e2efd5fb5483f09e3b005a2a2dd20c5471dcd29581fe4fb5f"
+            },
+            {
+              "sequence": 4,
+              "block_ids": [
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "4 异常核对"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 119,
+              "sha256": "3d96b693cc347772f0abcabc46bf5f8568d3c19be999c64145b3a5cd73ec6463"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 240,
+            "max_chars": 240,
+            "min_chars": 0
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7",
+                "md:8:9"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 207,
+              "sha256": "e33b132fc0ce13bdfe885914c1f78a9bab7f9317573db420bf4aafd2752c90f0"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:10:11",
+                "md:12:13"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "2 支付渠道到账时限"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 47,
+              "sha256": "678ccf930f29d2e9ac317eeccb4bec4d20c2b80d04e4baa77b2331e36d072164"
+            },
+            {
+              "sequence": 3,
+              "block_ids": [
+                "md:14:18"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "2 支付渠道到账时限"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                }
+              ],
+              "oversized_atom": true,
+              "characters": 333,
+              "sha256": "cf3233795360b4be4a9a7d8a2d8fea8e85627e34696a6f9bb4c753f0020a8808"
+            },
+            {
+              "sequence": 4,
+              "block_ids": [
+                "md:23:24",
+                "md:25:26",
+                "md:27:30"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "3 到账时长计算"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 213,
+              "sha256": "07abbbd02f1dcb8e2efd5fb5483f09e3b005a2a2dd20c5471dcd29581fe4fb5f"
+            },
+            {
+              "sequence": 5,
+              "block_ids": [
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "4 异常核对"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 119,
+              "sha256": "3d96b693cc347772f0abcabc46bf5f8568d3c19be999c64145b3a5cd73ec6463"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 240,
+            "max_chars": 360,
+            "min_chars": 0
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7",
+                "md:8:9"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 207,
+              "sha256": "e33b132fc0ce13bdfe885914c1f78a9bab7f9317573db420bf4aafd2752c90f0"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:10:11",
+                "md:12:13"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "2 支付渠道到账时限"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 47,
+              "sha256": "678ccf930f29d2e9ac317eeccb4bec4d20c2b80d04e4baa77b2331e36d072164"
+            },
+            {
+              "sequence": 3,
+              "block_ids": [
+                "md:14:18"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "2 支付渠道到账时限"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 333,
+              "sha256": "cf3233795360b4be4a9a7d8a2d8fea8e85627e34696a6f9bb4c753f0020a8808"
+            },
+            {
+              "sequence": 4,
+              "block_ids": [
+                "md:23:24",
+                "md:25:26",
+                "md:27:30"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "3 到账时长计算"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 213,
+              "sha256": "07abbbd02f1dcb8e2efd5fb5483f09e3b005a2a2dd20c5471dcd29581fe4fb5f"
+            },
+            {
+              "sequence": 5,
+              "block_ids": [
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "4 异常核对"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 119,
+              "sha256": "3d96b693cc347772f0abcabc46bf5f8568d3c19be999c64145b3a5cd73ec6463"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 240,
+            "max_chars": 720,
+            "min_chars": 0
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7",
+                "md:8:9"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 207,
+              "sha256": "e33b132fc0ce13bdfe885914c1f78a9bab7f9317573db420bf4aafd2752c90f0"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:10:11",
+                "md:12:13",
+                "md:14:18"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "2 支付渠道到账时限"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 382,
+              "sha256": "d701ee673f0f73db7d6bdcaa3aa471c7ecfb518e79c46040fc583fa13f49124e"
+            },
+            {
+              "sequence": 3,
+              "block_ids": [
+                "md:23:24",
+                "md:25:26",
+                "md:27:30"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "3 到账时长计算"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 213,
+              "sha256": "07abbbd02f1dcb8e2efd5fb5483f09e3b005a2a2dd20c5471dcd29581fe4fb5f"
+            },
+            {
+              "sequence": 4,
+              "block_ids": [
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "4 异常核对"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 119,
+              "sha256": "3d96b693cc347772f0abcabc46bf5f8568d3c19be999c64145b3a5cd73ec6463"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 500,
+            "max_chars": 500,
+            "min_chars": 0
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7",
+                "md:8:9",
+                "md:10:11",
+                "md:12:13"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 256,
+              "sha256": "b0bd213e1b1a66b665a8c1f93e67501ae550ff90e54ae6f8281fe3e64bfd989a"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:14:18",
+                "md:23:24",
+                "md:25:26"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "2 支付渠道到账时限"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 374,
+              "sha256": "9403d932ca43764cd73db1b2b668d75ded66b883923f2db6cc55add852ad1471"
+            },
+            {
+              "sequence": 3,
+              "block_ids": [
+                "md:27:30",
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "3 到账时长计算"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 293,
+              "sha256": "a3aa86df5e00959de7bf7e1ccc97a323c19ec7da1c75b87677652162dcbac341"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 500,
+            "max_chars": 720,
+            "min_chars": 0
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7",
+                "md:8:9",
+                "md:10:11",
+                "md:12:13",
+                "md:14:18"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 591,
+              "sha256": "1c32fcbb9be7bf76e6c7f3f7bdad60e473d2f23deca6ba7974fd81461fe0919a"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:23:24",
+                "md:25:26",
+                "md:27:30",
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "3 到账时长计算"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 334,
+              "sha256": "ad10d6af255f69ed0ebe66bf36f237d0bf3cecfb3f8428ce08f9e183836468f0"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 1000,
+            "max_chars": 1000,
+            "min_chars": 0
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7",
+                "md:8:9",
+                "md:10:11",
+                "md:12:13",
+                "md:14:18",
+                "md:23:24",
+                "md:25:26",
+                "md:27:30"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 806,
+              "sha256": "ccae51f6912876e5c5216684f130b4031d71c0f9d10d90dd8a1dbf14670f28bb"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "4 异常核对"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 119,
+              "sha256": "3d96b693cc347772f0abcabc46bf5f8568d3c19be999c64145b3a5cd73ec6463"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 180,
+            "max_chars": 180,
+            "min_chars": 80
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 150,
+              "sha256": "3202cee2831635092511370f0e8edd69cbf6fb40741730b1a1316814c46c31e7"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:8:9",
+                "md:10:11",
+                "md:12:13"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "1 申请与验收"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 104,
+              "sha256": "1508d1485a06fc01aa41393fe701b5cdca42e991b287bd93d93063fd4cf1581f"
+            },
+            {
+              "sequence": 3,
+              "block_ids": [
+                "md:14:18"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "2 支付渠道到账时限"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                }
+              ],
+              "oversized_atom": true,
+              "characters": 333,
+              "sha256": "cf3233795360b4be4a9a7d8a2d8fea8e85627e34696a6f9bb4c753f0020a8808"
+            },
+            {
+              "sequence": 4,
+              "block_ids": [
+                "md:23:24",
+                "md:25:26",
+                "md:27:30"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "3 到账时长计算"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 213,
+              "sha256": "07abbbd02f1dcb8e2efd5fb5483f09e3b005a2a2dd20c5471dcd29581fe4fb5f"
+            },
+            {
+              "sequence": 5,
+              "block_ids": [
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "4 异常核对"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 119,
+              "sha256": "3d96b693cc347772f0abcabc46bf5f8568d3c19be999c64145b3a5cd73ec6463"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 180,
+            "max_chars": 360,
+            "min_chars": 80
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7",
+                "md:8:9"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 207,
+              "sha256": "e33b132fc0ce13bdfe885914c1f78a9bab7f9317573db420bf4aafd2752c90f0"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:10:11",
+                "md:12:13",
+                "md:14:18"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "2 支付渠道到账时限"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 382,
+              "sha256": "d701ee673f0f73db7d6bdcaa3aa471c7ecfb518e79c46040fc583fa13f49124e"
+            },
+            {
+              "sequence": 3,
+              "block_ids": [
+                "md:23:24",
+                "md:25:26",
+                "md:27:30"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "3 到账时长计算"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 213,
+              "sha256": "07abbbd02f1dcb8e2efd5fb5483f09e3b005a2a2dd20c5471dcd29581fe4fb5f"
+            },
+            {
+              "sequence": 4,
+              "block_ids": [
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "4 异常核对"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 119,
+              "sha256": "3d96b693cc347772f0abcabc46bf5f8568d3c19be999c64145b3a5cd73ec6463"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 180,
+            "max_chars": 720,
+            "min_chars": 80
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7",
+                "md:8:9"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 207,
+              "sha256": "e33b132fc0ce13bdfe885914c1f78a9bab7f9317573db420bf4aafd2752c90f0"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:10:11",
+                "md:12:13",
+                "md:14:18"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "2 支付渠道到账时限"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 382,
+              "sha256": "d701ee673f0f73db7d6bdcaa3aa471c7ecfb518e79c46040fc583fa13f49124e"
+            },
+            {
+              "sequence": 3,
+              "block_ids": [
+                "md:23:24",
+                "md:25:26",
+                "md:27:30"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "3 到账时长计算"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 213,
+              "sha256": "07abbbd02f1dcb8e2efd5fb5483f09e3b005a2a2dd20c5471dcd29581fe4fb5f"
+            },
+            {
+              "sequence": 4,
+              "block_ids": [
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "4 异常核对"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 119,
+              "sha256": "3d96b693cc347772f0abcabc46bf5f8568d3c19be999c64145b3a5cd73ec6463"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 240,
+            "max_chars": 240,
+            "min_chars": 80
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7",
+                "md:8:9"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 207,
+              "sha256": "e33b132fc0ce13bdfe885914c1f78a9bab7f9317573db420bf4aafd2752c90f0"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:10:11",
+                "md:12:13",
+                "md:14:18"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "2 支付渠道到账时限"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                }
+              ],
+              "oversized_atom": true,
+              "characters": 382,
+              "sha256": "d701ee673f0f73db7d6bdcaa3aa471c7ecfb518e79c46040fc583fa13f49124e"
+            },
+            {
+              "sequence": 3,
+              "block_ids": [
+                "md:23:24",
+                "md:25:26",
+                "md:27:30"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "3 到账时长计算"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 213,
+              "sha256": "07abbbd02f1dcb8e2efd5fb5483f09e3b005a2a2dd20c5471dcd29581fe4fb5f"
+            },
+            {
+              "sequence": 4,
+              "block_ids": [
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "4 异常核对"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 119,
+              "sha256": "3d96b693cc347772f0abcabc46bf5f8568d3c19be999c64145b3a5cd73ec6463"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 240,
+            "max_chars": 360,
+            "min_chars": 80
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7",
+                "md:8:9"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 207,
+              "sha256": "e33b132fc0ce13bdfe885914c1f78a9bab7f9317573db420bf4aafd2752c90f0"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:10:11",
+                "md:12:13",
+                "md:14:18"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "2 支付渠道到账时限"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 382,
+              "sha256": "d701ee673f0f73db7d6bdcaa3aa471c7ecfb518e79c46040fc583fa13f49124e"
+            },
+            {
+              "sequence": 3,
+              "block_ids": [
+                "md:23:24",
+                "md:25:26",
+                "md:27:30"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "3 到账时长计算"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 213,
+              "sha256": "07abbbd02f1dcb8e2efd5fb5483f09e3b005a2a2dd20c5471dcd29581fe4fb5f"
+            },
+            {
+              "sequence": 4,
+              "block_ids": [
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "4 异常核对"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 119,
+              "sha256": "3d96b693cc347772f0abcabc46bf5f8568d3c19be999c64145b3a5cd73ec6463"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 240,
+            "max_chars": 720,
+            "min_chars": 80
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7",
+                "md:8:9"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 207,
+              "sha256": "e33b132fc0ce13bdfe885914c1f78a9bab7f9317573db420bf4aafd2752c90f0"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:10:11",
+                "md:12:13",
+                "md:14:18"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "2 支付渠道到账时限"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 382,
+              "sha256": "d701ee673f0f73db7d6bdcaa3aa471c7ecfb518e79c46040fc583fa13f49124e"
+            },
+            {
+              "sequence": 3,
+              "block_ids": [
+                "md:23:24",
+                "md:25:26",
+                "md:27:30"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "3 到账时长计算"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 213,
+              "sha256": "07abbbd02f1dcb8e2efd5fb5483f09e3b005a2a2dd20c5471dcd29581fe4fb5f"
+            },
+            {
+              "sequence": 4,
+              "block_ids": [
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "4 异常核对"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 119,
+              "sha256": "3d96b693cc347772f0abcabc46bf5f8568d3c19be999c64145b3a5cd73ec6463"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 500,
+            "max_chars": 500,
+            "min_chars": 80
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7",
+                "md:8:9",
+                "md:10:11",
+                "md:12:13"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 256,
+              "sha256": "b0bd213e1b1a66b665a8c1f93e67501ae550ff90e54ae6f8281fe3e64bfd989a"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:14:18",
+                "md:23:24",
+                "md:25:26"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "2 支付渠道到账时限"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 374,
+              "sha256": "9403d932ca43764cd73db1b2b668d75ded66b883923f2db6cc55add852ad1471"
+            },
+            {
+              "sequence": 3,
+              "block_ids": [
+                "md:27:30",
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "3 到账时长计算"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 293,
+              "sha256": "a3aa86df5e00959de7bf7e1ccc97a323c19ec7da1c75b87677652162dcbac341"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 500,
+            "max_chars": 720,
+            "min_chars": 80
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7",
+                "md:8:9",
+                "md:10:11",
+                "md:12:13",
+                "md:14:18"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 591,
+              "sha256": "1c32fcbb9be7bf76e6c7f3f7bdad60e473d2f23deca6ba7974fd81461fe0919a"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:23:24",
+                "md:25:26",
+                "md:27:30",
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "3 到账时长计算"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 334,
+              "sha256": "ad10d6af255f69ed0ebe66bf36f237d0bf3cecfb3f8428ce08f9e183836468f0"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 1000,
+            "max_chars": 1000,
+            "min_chars": 80
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7",
+                "md:8:9",
+                "md:10:11",
+                "md:12:13",
+                "md:14:18",
+                "md:23:24",
+                "md:25:26",
+                "md:27:30"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 806,
+              "sha256": "ccae51f6912876e5c5216684f130b4031d71c0f9d10d90dd8a1dbf14670f28bb"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "4 异常核对"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 119,
+              "sha256": "3d96b693cc347772f0abcabc46bf5f8568d3c19be999c64145b3a5cd73ec6463"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 180,
+            "max_chars": 180,
+            "min_chars": 180
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7",
+                "md:8:9"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 207,
+              "sha256": "e33b132fc0ce13bdfe885914c1f78a9bab7f9317573db420bf4aafd2752c90f0"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:10:11",
+                "md:12:13",
+                "md:14:18"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "2 支付渠道到账时限"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                }
+              ],
+              "oversized_atom": true,
+              "characters": 382,
+              "sha256": "d701ee673f0f73db7d6bdcaa3aa471c7ecfb518e79c46040fc583fa13f49124e"
+            },
+            {
+              "sequence": 3,
+              "block_ids": [
+                "md:23:24",
+                "md:25:26",
+                "md:27:30"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "3 到账时长计算"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 213,
+              "sha256": "07abbbd02f1dcb8e2efd5fb5483f09e3b005a2a2dd20c5471dcd29581fe4fb5f"
+            },
+            {
+              "sequence": 4,
+              "block_ids": [
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "4 异常核对"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 119,
+              "sha256": "3d96b693cc347772f0abcabc46bf5f8568d3c19be999c64145b3a5cd73ec6463"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 180,
+            "max_chars": 360,
+            "min_chars": 180
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7",
+                "md:8:9"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 207,
+              "sha256": "e33b132fc0ce13bdfe885914c1f78a9bab7f9317573db420bf4aafd2752c90f0"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:10:11",
+                "md:12:13",
+                "md:14:18"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "2 支付渠道到账时限"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 382,
+              "sha256": "d701ee673f0f73db7d6bdcaa3aa471c7ecfb518e79c46040fc583fa13f49124e"
+            },
+            {
+              "sequence": 3,
+              "block_ids": [
+                "md:23:24",
+                "md:25:26",
+                "md:27:30"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "3 到账时长计算"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 213,
+              "sha256": "07abbbd02f1dcb8e2efd5fb5483f09e3b005a2a2dd20c5471dcd29581fe4fb5f"
+            },
+            {
+              "sequence": 4,
+              "block_ids": [
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "4 异常核对"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 119,
+              "sha256": "3d96b693cc347772f0abcabc46bf5f8568d3c19be999c64145b3a5cd73ec6463"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 180,
+            "max_chars": 720,
+            "min_chars": 180
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7",
+                "md:8:9"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 207,
+              "sha256": "e33b132fc0ce13bdfe885914c1f78a9bab7f9317573db420bf4aafd2752c90f0"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:10:11",
+                "md:12:13",
+                "md:14:18"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "2 支付渠道到账时限"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 382,
+              "sha256": "d701ee673f0f73db7d6bdcaa3aa471c7ecfb518e79c46040fc583fa13f49124e"
+            },
+            {
+              "sequence": 3,
+              "block_ids": [
+                "md:23:24",
+                "md:25:26",
+                "md:27:30"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "3 到账时长计算"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 213,
+              "sha256": "07abbbd02f1dcb8e2efd5fb5483f09e3b005a2a2dd20c5471dcd29581fe4fb5f"
+            },
+            {
+              "sequence": 4,
+              "block_ids": [
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "4 异常核对"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 119,
+              "sha256": "3d96b693cc347772f0abcabc46bf5f8568d3c19be999c64145b3a5cd73ec6463"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 240,
+            "max_chars": 240,
+            "min_chars": 180
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7",
+                "md:8:9"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 207,
+              "sha256": "e33b132fc0ce13bdfe885914c1f78a9bab7f9317573db420bf4aafd2752c90f0"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:10:11",
+                "md:12:13",
+                "md:14:18"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "2 支付渠道到账时限"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                }
+              ],
+              "oversized_atom": true,
+              "characters": 382,
+              "sha256": "d701ee673f0f73db7d6bdcaa3aa471c7ecfb518e79c46040fc583fa13f49124e"
+            },
+            {
+              "sequence": 3,
+              "block_ids": [
+                "md:23:24",
+                "md:25:26",
+                "md:27:30"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "3 到账时长计算"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 213,
+              "sha256": "07abbbd02f1dcb8e2efd5fb5483f09e3b005a2a2dd20c5471dcd29581fe4fb5f"
+            },
+            {
+              "sequence": 4,
+              "block_ids": [
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "4 异常核对"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 119,
+              "sha256": "3d96b693cc347772f0abcabc46bf5f8568d3c19be999c64145b3a5cd73ec6463"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 240,
+            "max_chars": 360,
+            "min_chars": 180
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7",
+                "md:8:9"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 207,
+              "sha256": "e33b132fc0ce13bdfe885914c1f78a9bab7f9317573db420bf4aafd2752c90f0"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:10:11",
+                "md:12:13",
+                "md:14:18"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "2 支付渠道到账时限"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 382,
+              "sha256": "d701ee673f0f73db7d6bdcaa3aa471c7ecfb518e79c46040fc583fa13f49124e"
+            },
+            {
+              "sequence": 3,
+              "block_ids": [
+                "md:23:24",
+                "md:25:26",
+                "md:27:30"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "3 到账时长计算"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 213,
+              "sha256": "07abbbd02f1dcb8e2efd5fb5483f09e3b005a2a2dd20c5471dcd29581fe4fb5f"
+            },
+            {
+              "sequence": 4,
+              "block_ids": [
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "4 异常核对"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 119,
+              "sha256": "3d96b693cc347772f0abcabc46bf5f8568d3c19be999c64145b3a5cd73ec6463"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 240,
+            "max_chars": 720,
+            "min_chars": 180
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7",
+                "md:8:9"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 207,
+              "sha256": "e33b132fc0ce13bdfe885914c1f78a9bab7f9317573db420bf4aafd2752c90f0"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:10:11",
+                "md:12:13",
+                "md:14:18"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "2 支付渠道到账时限"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 382,
+              "sha256": "d701ee673f0f73db7d6bdcaa3aa471c7ecfb518e79c46040fc583fa13f49124e"
+            },
+            {
+              "sequence": 3,
+              "block_ids": [
+                "md:23:24",
+                "md:25:26",
+                "md:27:30"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "3 到账时长计算"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 213,
+              "sha256": "07abbbd02f1dcb8e2efd5fb5483f09e3b005a2a2dd20c5471dcd29581fe4fb5f"
+            },
+            {
+              "sequence": 4,
+              "block_ids": [
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "4 异常核对"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 119,
+              "sha256": "3d96b693cc347772f0abcabc46bf5f8568d3c19be999c64145b3a5cd73ec6463"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 500,
+            "max_chars": 500,
+            "min_chars": 180
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7",
+                "md:8:9",
+                "md:10:11",
+                "md:12:13"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 256,
+              "sha256": "b0bd213e1b1a66b665a8c1f93e67501ae550ff90e54ae6f8281fe3e64bfd989a"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:14:18",
+                "md:23:24",
+                "md:25:26"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "2 支付渠道到账时限"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 374,
+              "sha256": "9403d932ca43764cd73db1b2b668d75ded66b883923f2db6cc55add852ad1471"
+            },
+            {
+              "sequence": 3,
+              "block_ids": [
+                "md:27:30",
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "3 到账时长计算"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 293,
+              "sha256": "a3aa86df5e00959de7bf7e1ccc97a323c19ec7da1c75b87677652162dcbac341"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 500,
+            "max_chars": 720,
+            "min_chars": 180
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7",
+                "md:8:9",
+                "md:10:11",
+                "md:12:13",
+                "md:14:18"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 591,
+              "sha256": "1c32fcbb9be7bf76e6c7f3f7bdad60e473d2f23deca6ba7974fd81461fe0919a"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:23:24",
+                "md:25:26",
+                "md:27:30",
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "3 到账时长计算"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 334,
+              "sha256": "ad10d6af255f69ed0ebe66bf36f237d0bf3cecfb3f8428ce08f9e183836468f0"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 1000,
+            "max_chars": 1000,
+            "min_chars": 180
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:7",
+                "md:8:9",
+                "md:10:11",
+                "md:12:13",
+                "md:14:18",
+                "md:23:24",
+                "md:25:26",
+                "md:27:30"
+              ],
+              "section_path": [
+                "售后退款处理说明"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 7
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 9,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 13,
+                  "line_end": 13
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 15,
+                  "line_end": 18
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 20,
+                  "line_end": 20
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 22,
+                  "line_end": 22
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 24,
+                  "line_end": 24
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 26,
+                  "line_end": 26
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 28,
+                  "line_end": 30
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 32,
+                  "line_end": 32
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 806,
+              "sha256": "ccae51f6912876e5c5216684f130b4031d71c0f9d10d90dd8a1dbf14670f28bb"
+            },
+            {
+              "sequence": 2,
+              "block_ids": [
+                "md:33:34",
+                "md:35:36",
+                "md:37:38"
+              ],
+              "section_path": [
+                "售后退款处理说明",
+                "4 异常核对"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 34,
+                  "line_end": 34
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 36,
+                  "line_end": 36
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 38,
+                  "line_end": 38
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 119,
+              "sha256": "3d96b693cc347772f0abcabc46bf5f8568d3c19be999c64145b3a5cd73ec6463"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unicode",
+      "title": "Unicode boundary",
+      "blocks": [
+        {
+          "id": "md:0:1",
+          "kind": "heading",
+          "markdown": "# 🐴",
+          "level": 1,
+          "source_refs": [
+            {
+              "kind": "markdown_lines",
+              "line_start": 1,
+              "line_end": 1
+            }
+          ]
+        },
+        {
+          "id": "md:2:3",
+          "kind": "text",
+          "markdown": "说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀说明😀",
+          "level": 0,
+          "source_refs": [
+            {
+              "kind": "markdown_lines",
+              "line_start": 3,
+              "line_end": 3
+            }
+          ]
+        },
+        {
+          "id": "md:4:5",
+          "kind": "heading",
+          "markdown": "## 公式",
+          "level": 2,
+          "source_refs": [
+            {
+              "kind": "markdown_lines",
+              "line_start": 5,
+              "line_end": 5
+            }
+          ]
+        },
+        {
+          "id": "md:6:9",
+          "kind": "equation",
+          "markdown": "$$\nx=1\n$$\n\n式中 x 为数量。",
+          "level": 0,
+          "source_refs": [
+            {
+              "kind": "markdown_lines",
+              "line_start": 7,
+              "line_end": 9
+            },
+            {
+              "kind": "markdown_lines",
+              "line_start": 11,
+              "line_end": 11
+            }
+          ]
+        }
+      ],
+      "cases": [
+        {
+          "options": {
+            "target_chars": 180,
+            "max_chars": 180,
+            "min_chars": 0
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 180,
+            "max_chars": 360,
+            "min_chars": 0
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 180,
+            "max_chars": 720,
+            "min_chars": 0
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 240,
+            "max_chars": 240,
+            "min_chars": 0
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 240,
+            "max_chars": 360,
+            "min_chars": 0
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 240,
+            "max_chars": 720,
+            "min_chars": 0
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 500,
+            "max_chars": 500,
+            "min_chars": 0
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 500,
+            "max_chars": 720,
+            "min_chars": 0
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 1000,
+            "max_chars": 1000,
+            "min_chars": 0
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 180,
+            "max_chars": 180,
+            "min_chars": 80
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 180,
+            "max_chars": 360,
+            "min_chars": 80
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 180,
+            "max_chars": 720,
+            "min_chars": 80
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 240,
+            "max_chars": 240,
+            "min_chars": 80
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 240,
+            "max_chars": 360,
+            "min_chars": 80
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 240,
+            "max_chars": 720,
+            "min_chars": 80
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 500,
+            "max_chars": 500,
+            "min_chars": 80
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 500,
+            "max_chars": 720,
+            "min_chars": 80
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 1000,
+            "max_chars": 1000,
+            "min_chars": 80
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 180,
+            "max_chars": 180,
+            "min_chars": 180
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 180,
+            "max_chars": 360,
+            "min_chars": 180
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 180,
+            "max_chars": 720,
+            "min_chars": 180
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 240,
+            "max_chars": 240,
+            "min_chars": 180
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 240,
+            "max_chars": 360,
+            "min_chars": 180
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 240,
+            "max_chars": 720,
+            "min_chars": 180
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 500,
+            "max_chars": 500,
+            "min_chars": 180
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 500,
+            "max_chars": 720,
+            "min_chars": 180
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        },
+        {
+          "options": {
+            "target_chars": 1000,
+            "max_chars": 1000,
+            "min_chars": 180
+          },
+          "chunks": [
+            {
+              "sequence": 1,
+              "block_ids": [
+                "md:0:1",
+                "md:2:3",
+                "md:4:5",
+                "md:6:9"
+              ],
+              "section_path": [
+                "🐴"
+              ],
+              "source_refs": [
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 1,
+                  "line_end": 1
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 3,
+                  "line_end": 3
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 5,
+                  "line_end": 5
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 7,
+                  "line_end": 9
+                },
+                {
+                  "kind": "markdown_lines",
+                  "line_start": 11,
+                  "line_end": 11
+                }
+              ],
+              "oversized_atom": false,
+              "characters": 154,
+              "sha256": "d1ea9fd3c0eaf0baf2f9b17003a7ef79e0833fbed8439fd8f2a00afa16ca6c6a"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

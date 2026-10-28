@@ -6,7 +6,7 @@
 
 | 要求 | 实现位置 / 评审入口 | 验证方式 |
 | --- | --- | --- |
-| PDF / Markdown 解析、分块、向量入库 | [入库设计](ingestion.md)，`ingestion/` | 结构单元测试、真实 PGVectorStore 集成测试；单份 PDF 已经真实 MinerU 联调 |
+| PDF / Markdown 解析、分块、向量入库 | [入库设计](ingestion.md)，`ingestion/` | 结构单元测试、真实 PGVectorStore 集成测试；10份PDF已真实MinerU解析、分块与入库验证 |
 | 引用定位到文档标题与段落/条款 | [引用工具](../apps/api/src/xiaoma/agent/tools.py)，[前端引用](../apps/web/src/features/chat/chat-citation.tsx) | 来源元数据与 Markdown AST 测试；浏览器原文定位/高亮；引用是否支持结论还需语义验收 |
 | 多张相关业务表 | [10 表数据](../data/business/README.md) | 实际导入并校验行数、约束，真实 PostgreSQL 测试 |
 | 显式 Schema Linking | [SQL 工具](../apps/api/src/xiaoma/agent/sql.py)，[SQL Skill](../skills/sql/SKILL.md) | 目录 → 查看候选结构 → `link_schema` → 执行；未查看或未链接字段被拒绝 |

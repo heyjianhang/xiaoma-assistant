@@ -42,7 +42,7 @@ sh scripts/xiaoma.sh --json chat --input tests/prompt.txt --skill sql --no-knowl
 sh scripts/xiaoma.sh --json chat --input -
 ```
 
-默认流式回答写 stdout，进度和工具状态写 stderr。`--json` 时 stdout 只输出一个完整结果 JSON，便于脚本读取；进度仍在 stderr。成功收到完成事件退出码为 0；服务错误、断流或参数错误为 1；Ctrl+C 为 130。完成表示本次执行完成，不等于答案已经通过语义验收。失败时保留部分回答，不把半截输出当作成功。
+默认流式回答写 stdout，进度和工具状态写 stderr。`--json` 时 stdout 只输出一个完整结果 JSON，便于脚本读取；进度仍在 stderr。成功收到完成事件退出码为 0；服务错误、断流或参数错误为 1；Ctrl+C 为 130。完成表示本次执行完成，不等于答案已经通过语义验收。失败时保留部分回答，不把半截输出当作成功。聊天由后台队列执行，断流或 CLI 退出不会隐式取消；Ctrl+C 会尝试发送停止请求，若网络不可达，应重新登录后用 `stop RUN_UUID` 确认停止。`inspect` 可以读取后台保存的进度和结果，不能以订阅结束判断任务成功。
 
 每次发送保存一份 `var/debug-runs/北京时间-随机ID/`：
 
@@ -64,6 +64,7 @@ sh scripts/xiaoma.sh --json chat --input -
 sh scripts/xiaoma.sh threads list
 sh scripts/xiaoma.sh threads show CONVERSATION_UUID
 sh scripts/xiaoma.sh inspect RUN_UUID
+sh scripts/xiaoma.sh stop RUN_UUID
 sh scripts/xiaoma.sh threads archive CONVERSATION_UUID
 sh scripts/xiaoma.sh threads restore CONVERSATION_UUID
 

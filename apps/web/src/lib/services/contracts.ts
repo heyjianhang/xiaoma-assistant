@@ -82,18 +82,29 @@ export interface Citation {
   clause: string;
 }
 
+export interface ChatReasoning {
+  id: string;
+  content: string;
+  state: "streaming" | "completed" | "stopped" | "error";
+  startedAt?: string;
+  durationMs?: number;
+}
+
 export interface ChatMessage {
   id: string;
+  runId?: string;
+  eventSeq?: number;
   role: "user" | "assistant";
   modelId?: string;
   toolAccess?: ChatToolAccess;
   selectedSkills?: string[];
   content: string;
+  reasoning?: ChatReasoning[];
   citations?: Citation[];
   steps?: string[];
   tools?: ChatToolCall[];
   todos?: ChatTodo[];
-  status?: "running" | "completed" | "stopped" | "error";
+  status?: "queued" | "running" | "completed" | "stopped" | "error";
   error?: string;
   stopped?: boolean;
   presentations?: PresentationSlot[];
@@ -108,6 +119,7 @@ export interface ChatToolCall {
   id: string;
   name: string;
   title: string;
+  startedAt?: string;
   state: "input-available" | "output-available" | "output-error" | "output-denied";
   input: Record<string, unknown>;
   output?: unknown;
@@ -142,10 +154,17 @@ export interface WorkspaceSnapshot {
 }
 
 export type ReplyEvent =
+  | { type: "run"; run_id: string; assistant_id: string; model_id: string }
+  | { type: "status"; status: "queued" | "running" }
+  | { type: "conversation"; conversation_id: string; title: string }
+  | { type: "complete" }
+  | { type: "stopped" }
+  | { type: "error"; message: string }
   | { type: "step"; text: string }
   | { type: "tool"; tool: ChatToolCall }
   | { type: "todos"; todos: ChatTodo[] }
   | { type: "delta"; text: string }
+  | { type: "reasoning"; id: string; text?: string; state?: ChatReasoning["state"]; startedAt?: string; durationMs?: number }
   | { type: "citations"; citations: Citation[] }
   | { type: "presentation"; slot: PresentationSlot };
 
@@ -167,7 +186,8 @@ export interface WorkspaceRepository {
   restoreConversation(conversation: Conversation, index: number): void;
   appendMessage(conversationId: string, message: ChatMessage): void;
   updateMessage(conversationId: string, messageId: string, patch: Partial<ChatMessage>): void;
-  reply(question: string, signal: AbortSignal, options?: { modelId?: string; tools?: ChatToolAccess; conversationId?: string; skills?: string[] }): AsyncGenerator<ReplyEvent>;
+  startRun(question: string, options: { modelId?: string; tools: ChatToolAccess; conversationId: string; skills: string[] }): Promise<void>;
+  stopRun(runId: string): Promise<void>;
   dispose(): void;
 }
 import type { PresentationSlot } from "@/features/chat/presentation-types";

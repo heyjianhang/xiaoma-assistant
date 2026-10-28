@@ -27,6 +27,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from .embeddings import ProviderEmbeddings
 from .rerank import rerank_runnable
 from .settings import Settings
+from .task_queue import PgQueue
 
 
 def utcnow():
@@ -98,6 +99,7 @@ class Database:
             Column("value", JSONB, nullable=False),
         )
         self.store: PGVectorStore | None = None
+        self.queue = PgQueue(self)
 
     @property
     def vector_table(self):
@@ -179,6 +181,7 @@ class Database:
                     schema_name=self.schema,
                     metadata_columns=["document_id", "revision", "index_id", "active", "enabled"],
                 )
+                await self.queue.initialize()
             finally:
                 await guard.execute(text("SELECT pg_advisory_unlock(:lock)"), {"lock": lock})
                 await guard.commit()

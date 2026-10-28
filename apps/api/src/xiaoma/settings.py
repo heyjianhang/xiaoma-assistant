@@ -66,6 +66,12 @@ class Settings(BaseSettings):
     upload_max_bytes: int = Field(default=20 * 1024 * 1024, ge=1)
     worker_poll_interval: float = Field(default=1, ge=0.01)
     job_lease_seconds: int = Field(default=120, ge=10)
+    background_workers_enabled: bool = True
+    chat_worker_concurrency: int = Field(default=4, ge=1, le=32)
+    chat_owner_concurrency: int = Field(default=2, ge=1, le=8)
+    chat_owner_pending_limit: int = Field(default=10, ge=1, le=50)
+    ingestion_worker_concurrency: int = Field(default=2, ge=1, le=8)
+    run_event_poll_interval: float = Field(default=0.1, ge=0.01, le=2)
 
     @property
     def rerank_endpoint(self) -> str:

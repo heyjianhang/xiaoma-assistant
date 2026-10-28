@@ -43,6 +43,8 @@ jobs:
           content = content.replace('15433', '5432')
           Path('.env').write_text(content)
           PY
+      - name: Install pinned PGMQ SQL distribution
+        run: uv run --project apps/api python scripts/init_queue.py
       - name: Import synthetic business data
         run: uv run --project apps/api python scripts/import_business.py
       - run: make check-backend

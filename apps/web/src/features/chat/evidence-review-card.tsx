@@ -1,6 +1,7 @@
 "use client";
 
 import { CheckIcon, CircleAlertIcon } from "lucide-react";
+import type { ReactNode } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,8 +10,8 @@ import { EvidenceSourceButton } from "./evidence-source";
 import { QueryDetailsButton } from "./query-details";
 import type { UiTone } from "@/lib/ui-tones";
 
-export function EvidenceReviewCard({ payload }: { payload: ReviewPresentation }) {
-  const tone: UiTone = payload.verdict === "存在差异" || payload.verdict === "存在执行偏差" ? "danger" : payload.verdict === "版本适用" ? "success" : payload.verdict === "不可直接比较" ? "info" : "warning";
+export function EvidenceReviewCard({ payload, footer }: { payload: ReviewPresentation; footer?: ReactNode }) {
+  const tone: UiTone = payload.verdict === "存在差异" || payload.verdict === "存在执行偏差" ? "danger" : payload.verdict === "版本适用" || payload.verdict === "核验一致" ? "success" : payload.verdict === "不可直接比较" ? "info" : "warning";
   return <Card tone={tone} aria-label={payload.title} className="min-w-0">
     <CardHeader><CardTitle>{payload.title}</CardTitle><CardDescription>{payload.summary}</CardDescription><CardAction><Badge variant="outline" tone={tone}>{payload.verdict}</Badge></CardAction></CardHeader>
     <CardContent className="flex flex-col gap-4">
@@ -18,6 +19,6 @@ export function EvidenceReviewCard({ payload }: { payload: ReviewPresentation })
       {!!payload.checks.length && <ul aria-label="核对依据" className="flex flex-col gap-2">{payload.checks.map(check => <li key={check} className="flex items-start gap-2 text-sm leading-6"><CheckIcon className="mt-1 size-4 shrink-0 text-muted-foreground" /><span>{check}</span></li>)}</ul>}
       {!!payload.limitations.length && <Alert tone={tone}><CircleAlertIcon /><AlertDescription><ul className="flex flex-col gap-2">{payload.limitations.map(limit => <li key={limit}>{limit}</li>)}</ul></AlertDescription></Alert>}
     </CardContent>
-    <CardFooter className="flex-wrap justify-between gap-2"><div className="flex flex-wrap items-center gap-1"><Badge variant="outline">证据核对</Badge>{payload.sources.map(source => <EvidenceSourceButton key={source.id} source={source} />)}</div>{payload.result && <QueryDetailsButton result={payload.result} />}</CardFooter>
+    <CardFooter className="flex-wrap justify-between gap-2">{footer ?? <><div className="flex flex-wrap items-center gap-1"><Badge variant="outline">证据核对</Badge>{payload.sources.map(source => <EvidenceSourceButton key={source.id} source={source} />)}</div>{payload.result && <QueryDetailsButton result={payload.result} />}</>}</CardFooter>
   </Card>;
 }

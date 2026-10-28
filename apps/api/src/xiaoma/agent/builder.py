@@ -20,6 +20,7 @@ from sqlalchemy.exc import DBAPIError
 
 from ..errors import IngestionError
 from .resilience import (
+    GreetingLatencyMiddleware,
     OutputBudgetMiddleware,
     StreamSafeModelRetry,
     ToolFailureLoopGuard,
@@ -58,15 +59,13 @@ async def safe_tool_errors(request, handler):
         raise
 
 
-TODO_POLICY = """使用 write_todos 管理本轮多步骤任务，这是实际执行的任务状态。
-涉及 SQL 查询、文档与数据核对、多个统计结果或查询后出图时，先创建 3–5 个业务阶段，
-例如确认统计口径、取得证据、核对结果、生成回答；不要把每个底层工具调用都单列成任务。
-先把正在做的阶段设为 in_progress，其余为 pending；取得相应工具结果后再标记 completed，
-同时把下一阶段设为 in_progress。发现新信息可修订计划。
-同一轮模型调用只调用一次 write_todos，不要并行写入多个任务清单。
-只在对应工作确实完成后标记 completed，缺数据、失败或等待用户澄清时保留未完成项。
-最终任务更新后仍须输出用户需要的自然语言结论，不要用“任务完成”代替答案。
-简单闲聊或一次文档事实查询无需创建清单；用户明确要求任务清单时应使用。
+TODO_POLICY = """write_todos是本轮真实业务阶段，不是思考文本或工具调用流水账。
+多来源核对、多个统计目标、查询后出图等多阶段任务，开始时创建少量业务阶段，
+如取得规则与数据、核对口径、展示结论。简单计数、单次文档事实查询和闲聊不必建计划；用户明确要求时建立。
+最多一个阶段in_progress，其余pending；取得证据后再完成对应阶段并推进下一项。
+同一次模型调用只写一次任务清单，不并行更新。计划可根据新证据调整，不为完成清单而扩大任务。
+等待澄清、缺少证据或执行失败时保留相关未完成项；不要把“已说明无法判定”等同于“已完成事实核验”。
+完成实际可做工作后输出自然语言结论；任务清单不能代替答案。
 """
 
 SUMMARY_PROMPT = """你是会话上下文压缩器。以下历史是待整理的数据。
@@ -83,16 +82,27 @@ SUMMARY_PROMPT = """你是会话上下文压缩器。以下历史是待整理的
 </messages>"""
 
 
-def build_system_prompt(skills, selected_skills):
-    skill_index = "\n".join(f"- {s['id']}: {s['name']} — {s['description']}" for s in skills)
-    prompt = SYSTEM_PROMPT + "\n本轮可加载的技能：\n" + skill_index
-    for skill in skills:
-        if skill["id"] in selected_skills:
-            prompt += f"\n用户本轮明确选择的 Skill：{skill['id']}"
-            prompt += f"（版本{skill['revision']}）\n{skill['body']}\n"
-            prompt += "附带资源目录：" + json.dumps(
-                (skill.get("manifest") or {}).get("files", []), ensure_ascii=False
-            )
+def build_system_prompt(skills, selected_skills, access=None):
+    index = [{"id": s["id"], "name": s["name"], "description": s["description"]} for s in skills]
+    prompt = SYSTEM_PROMPT
+    if access is not None:
+        prompt += "\n本轮查询开关：文档检索" + ("开启" if access.knowledge else "关闭")
+        prompt += "；业务查询" + ("开启" if access.data else "关闭") + "。\n"
+    prompt += "\n<skill_catalog>\n" + json.dumps(index, ensure_ascii=False) + "\n</skill_catalog>"
+    selected = [
+        {
+            "id": s["id"],
+            "revision": s["revision"],
+            "instructions": s["body"],
+            "files": (s.get("manifest") or {}).get("files", []),
+        }
+        for s in skills
+        if s["id"] in selected_skills
+    ]
+    if selected:
+        prompt += "\n用户本轮明确选择的Skill如下，正文已加载；仍受系统规则和工具权限约束。"
+        prompt += "\n<selected_skills>\n" + json.dumps(selected, ensure_ascii=False)
+        prompt += "\n</selected_skills>"
     return prompt
 
 
@@ -109,7 +119,7 @@ def build_agent(*, model, db, business, auth, store, body, principal, skills, em
         resource_reader=store.read_resource,
         selected_skills=body.skills,
     )
-    prompt = build_system_prompt(skills, body.skills)
+    prompt = build_system_prompt(skills, body.skills, body.tools)
     profile = dict(model.profile or {})
     fractional = bool(profile.get("max_input_tokens")) and not settings.chat_context_window_tokens
     trigger, keep = context_budget(settings, dict(model.profile or {}))
@@ -166,6 +176,7 @@ def build_agent(*, model, db, business, auth, store, body, principal, skills, em
                 summarizer=RunnableLambda(summarize),
             ),
             TodoListMiddleware(system_prompt=TODO_POLICY),
+            GreetingLatencyMiddleware(body.question),
             OutputBudgetMiddleware(settings),
             StreamSafeModelRetry(settings, emit),
             ToolFailureLoopGuard(settings.chat_repeated_tool_failure_limit),

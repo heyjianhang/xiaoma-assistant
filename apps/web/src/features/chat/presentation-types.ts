@@ -35,9 +35,9 @@ export interface DataPresentation {
 }
 export interface ReviewPresentation {
   type: "evidence_review";
-  kind: "conflict" | "missing_definition" | "small_sample" | "execution_deviation";
+  kind: "conflict" | "missing_definition" | "small_sample" | "execution_deviation" | "missing_data" | "consistent";
   title: string;
-  verdict: "存在差异" | "待明确口径" | "样本不足" | "存在执行偏差" | "无法判定" | "版本适用" | "不可直接比较";
+  verdict: "存在差异" | "待明确口径" | "样本不足" | "存在执行偏差" | "无法判定" | "版本适用" | "不可直接比较" | "核验一致";
   summary: string;
   facts: { label: string; value: string; detail: string }[];
   checks: string[];

@@ -5,6 +5,7 @@ import type {
 } from "./contracts";
 import { UploadBatchError } from "./upload-error";
 import { defaultChunkConfiguration, processingStatuses } from "./knowledge-config";
+import { applyRunEvent, mergeRunSnapshot } from "./run-events";
 
 interface SourceReference {
   kind: string;
@@ -52,6 +53,7 @@ async function api<T>(path: string, init?: RequestInit): Promise<T> {
     const body = await response.json().catch(() => null);
     throw new ApiError(
       typeof body?.message === "string" ? body.message :
+        typeof body?.detail === "string" ? body.detail :
         response.status === 413 ? "文件超过上传大小限制。" :
         response.status === 422 ? "请求参数不符合要求，请检查后重试。" : "服务请求失败，请稍后重试。",
       response.status,
@@ -148,10 +150,78 @@ export function createHttpRepository(): WorkspaceRepository {
       if (items.length >= response.total || !response.items.length) return items;
     }
   }
+  let conversationLoadId = 0;
   async function loadConversations() {
+    const loadId = ++conversationLoadId;
     const response = await api<{ items: Conversation[] }>("/conversations");
+    if (!connected || loadId !== conversationLoadId) return;
     response.items.forEach(item => savedConversations.add(item.id));
-    emit({ conversations: response.items });
+    // A list response may have been read before a newer SSE frame arrived.
+    const localDrafts = snapshot.conversations.filter(item => !savedConversations.has(item.id));
+    emit({ conversations: [...localDrafts, ...response.items.map(item => ({ ...item, messages: item.messages.map(message => {
+      const local = snapshot.conversations.find(c => c.id === item.id)?.messages.find(m => m.id === message.id);
+      return mergeRunSnapshot(local, message);
+    }) }))] });
+    followActiveRuns();
+  }
+
+  const subscriptions = new Map<string, AbortController>();
+  const activeMessage = (runId: string) => snapshot.conversations.flatMap(c => c.messages).find(m => m.runId === runId);
+  const isActive = (message?: ChatMessage) => message?.status === "running" || message?.status === "queued";
+
+  function followActiveRuns() {
+    for (const conversation of snapshot.conversations) {
+      for (const message of conversation.messages) {
+        if (!message.runId || !isActive(message) || subscriptions.has(message.runId)) continue;
+        const abort = new AbortController();
+        subscriptions.set(message.runId, abort);
+        void followRun(message.runId, conversation.id, message.id, abort).finally(() => {
+          if (subscriptions.get(message.runId!) === abort) subscriptions.delete(message.runId!);
+        });
+      }
+    }
+  }
+
+  async function followRun(runId: string, conversationId: string, messageId: string, abort: AbortController) {
+    while (connected && !abort.signal.aborted && isActive(activeMessage(runId))) {
+      try {
+        const after = activeMessage(runId)?.eventSeq ?? 0;
+        const response = await authFetch(`/api/v1/agent/runs/${runId}/events?after=${after}`, { signal: abort.signal, cache: "no-store" });
+        if (!response.ok) throw new ApiError("运行订阅暂不可用", response.status);
+        if (!response.body) throw new Error("服务没有返回事件流");
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder(); let buffer = "";
+        try {
+          for (;;) {
+            const { done, value } = await reader.read();
+            buffer += decoder.decode(value, { stream: !done });
+            let position: number;
+            while ((position = buffer.indexOf("\n\n")) >= 0) {
+              const frame = buffer.slice(0, position); buffer = buffer.slice(position + 2);
+              const lines = frame.split("\n");
+              const data = lines.filter(line => line.startsWith("data: ")).map(line => line.slice(6)).join("\n");
+              if (!data) continue;
+              const event = JSON.parse(data) as ReplyEvent;
+              const sequence = Number(lines.find(line => line.startsWith("id: "))?.slice(4));
+              if (!Number.isSafeInteger(sequence)) {
+                if (event.type === "error") throw new ApiError(event.message, 403);
+                continue;
+              }
+              if (event.type === "conversation") emit({ conversations: snapshot.conversations.map(c => c.id === event.conversation_id ? { ...c, title: event.title } : c) });
+              const current = activeMessage(runId);
+              if (current) repository.updateMessage(conversationId, messageId, applyRunEvent(current, sequence, event));
+            }
+            if (done) break;
+          }
+        } finally { reader.releaseLock(); }
+        await loadConversations();
+      } catch (error) {
+        if (abort.signal.aborted || !connected) return;
+        if (error instanceof ApiError && [401, 403, 404].includes(error.status)) return;
+        // Transport failure detaches the viewer. The backend run is still alive.
+      }
+      if (isActive(activeMessage(runId))) await new Promise(resolve => setTimeout(resolve, 1000));
+    }
   }
   async function loadModels() {
     const response = await api<{ items: ChatModel[] }>("/agent/models");
@@ -195,8 +265,8 @@ export function createHttpRepository(): WorkspaceRepository {
   function schedule() {
     clearTimeout(timer);
     if (!connected) return;
-    const processing = snapshot.documents.some(doc => processingStatuses.has(doc.status));
-    timer = setTimeout(() => void refresh().finally(schedule), processing ? 1500 : 12000);
+    const processing = snapshot.documents.some(doc => processingStatuses.has(doc.status)) || snapshot.conversations.some(c => c.messages.some(isActive));
+    timer = setTimeout(() => void Promise.all([refresh(), loadConversations()]).catch(() => {}).finally(schedule), processing ? 1500 : 12000);
   }
   async function loadConfig(signal: AbortSignal) {
     const config = await api<{
@@ -214,9 +284,11 @@ export function createHttpRepository(): WorkspaceRepository {
   }
   function disconnect() {
     connected = false; generation++; clearTimeout(timer); controller.abort(); pendingRefresh = null;
+    for (const subscription of subscriptions.values()) subscription.abort();
+    subscriptions.clear();
     if (typeof window !== "undefined") window.removeEventListener("focus", focus);
   }
-  function focus() { void refresh().finally(schedule); }
+  function focus() { void Promise.all([refresh(), loadConversations()]).catch(() => {}).finally(schedule); }
 
   const repository: WorkspaceRepository = {
     getSnapshot: () => snapshot,
@@ -345,39 +417,18 @@ export function createHttpRepository(): WorkspaceRepository {
       emit({ conversations: snapshot.conversations.map(item => item.id === id
         ? { ...item, messages: item.messages.map(message => message.id === messageId ? { ...message, ...patch } : message) } : item) });
     },
-    async *reply(question, signal, options): AsyncGenerator<ReplyEvent> {
-      if (!options?.conversationId) throw new Error("缺少对话标识");
-      const response = await authFetch("/api/v1/agent/serve", { method: "POST", signal,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ conversation_id: options.conversationId, question,
-          model_id: options.modelId || undefined, tools: options.tools ?? { knowledge: true, data: true }, skills: options.skills ?? [] }),
-      });
-      if (!response.ok) { const body = await response.json().catch(() => null); throw new Error(body?.message ?? body?.detail ?? "Agent 服务请求失败"); }
+    async startRun(question, options) {
+      const run = generation;
+      await api<{ run_id: string }>("/agent/runs", { method: "POST", ...jsonBody({
+        conversation_id: options.conversationId, request_id: crypto.randomUUID(), question,
+        model_id: options.modelId || undefined, tools: options.tools, skills: options.skills,
+      }) });
       savedConversations.add(options.conversationId);
-      if (!response.body) throw new Error("服务没有返回事件流");
-      const reader = response.body.getReader(); const decoder = new TextDecoder(); let buffer = "";
-      try {
-        while (true) {
-          const { done, value } = await reader.read();
-          buffer += decoder.decode(value, { stream: !done });
-          let position: number;
-          while ((position = buffer.indexOf("\n\n")) >= 0) {
-            const frame = buffer.slice(0, position); buffer = buffer.slice(position + 2);
-            const data = frame.split("\n").filter(line => line.startsWith("data: ")).map(line => line.slice(6)).join("\n");
-            if (!data) continue;
-            const event = JSON.parse(data);
-            if (event.type === "error") throw new Error(event.message);
-            if (event.type === "conversation" && event.conversation_id === options.conversationId && typeof event.title === "string") {
-              emit({ conversations: snapshot.conversations.map(item => item.id === event.conversation_id ? { ...item, title: event.title } : item) });
-            }
-            if (["step", "tool", "todos", "delta", "citations", "presentation"].includes(event.type)) yield event as ReplyEvent;
-          }
-          if (done) break;
-        }
-      } finally {
-        reader.releaseLock();
-        if (!signal.aborted) await loadConversations();
-      }
+      if (run === generation && connected) { await loadConversations(); schedule(); }
+    },
+    async stopRun(runId) {
+      await api(`/agent/runs/${runId}/stop`, { method: "POST" });
+      await loadConversations(); schedule();
     },
     dispose: disconnect,
   };

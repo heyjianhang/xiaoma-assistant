@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LogOutIcon, BotIcon, BookOpenIcon, DatabaseIcon, MoreHorizontalIcon, PanelLeftCloseIcon, PanelLeftOpenIcon, PlusIcon, SquarePenIcon, Trash2Icon, XIcon } from "lucide-react";
+import { LogOutIcon, BotIcon, BookOpenIcon, DatabaseIcon, PanelsTopLeftIcon, MoreHorizontalIcon, PanelLeftCloseIcon, PanelLeftOpenIcon, PlusIcon, SquarePenIcon, Trash2Icon, XIcon } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
 import { toast } from "sonner";
 import { BrandMark } from "@/components/brand-mark";
 import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { Sidebar, SidebarFooter, SidebarContent, SidebarGroup, SidebarGroupAction, SidebarGroupLabel, SidebarHeader, SidebarInset, SidebarMenu, SidebarMenuAction, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -62,6 +63,7 @@ function Navigation() {
             { title: "知识库", href: "/knowledge", icon: BookOpenIcon, active: pathname.startsWith("/knowledge") },
             { title: "数据源", href: "/data-sources", icon: DatabaseIcon, active: pathname.startsWith("/data-sources") },
             ...(user?.role === "admin" ? [{ title: "Agent 配置", href: "/agents", icon: BotIcon, active: pathname.startsWith("/agents") }] : []),
+            { title: "项目介绍", href: "/project", icon: PanelsTopLeftIcon, active: pathname.startsWith("/project") },
           ].map(item => <SidebarMenuItem key={item.href}>
             <SidebarMenuButton className="h-10" tooltip={item.title} isActive={item.active} aria-current={item.active ? "page" : undefined} onClick={() => { if (item.href === "/chat") startNewConversation(); else navigate(item.href); }}><item.icon strokeWidth={1.7} /><span>{item.title}</span></SidebarMenuButton>
           </SidebarMenuItem>)}
@@ -78,7 +80,7 @@ function Navigation() {
       <SidebarGroup className="pt-0 group-data-[collapsible=icon]:hidden">
         <SidebarMenu>
           {conversations.map(conversation => <SidebarMenuItem key={conversation.id}>
-            <SidebarMenuButton className="h-9" isActive={pathname === "/chat" && activeId === conversation.id} onClick={() => { setActiveId(conversation.id); navigate("/chat"); }}><span>{conversation.title}</span></SidebarMenuButton>
+            <SidebarMenuButton className="h-9" isActive={pathname === "/chat" && activeId === conversation.id} onClick={() => { setActiveId(conversation.id); navigate("/chat"); }}><span className="min-w-0 flex-1 truncate" title={conversation.title}>{conversation.title}</span>{["queued", "running"].includes(conversation.messages.at(-1)?.status ?? "") && <Spinner aria-label={conversation.messages.at(-1)?.status === "queued" ? "排队中" : "运行中"} className="ml-auto shrink-0" />}</SidebarMenuButton>
             <DropdownMenu>
               <DropdownMenuTrigger asChild><SidebarMenuAction showOnHover aria-label={`对话操作：${conversation.title}`}><MoreHorizontalIcon /><span className="sr-only">对话操作</span></SidebarMenuAction></DropdownMenuTrigger>
               <DropdownMenuContent side="bottom" align="end" className="w-36">

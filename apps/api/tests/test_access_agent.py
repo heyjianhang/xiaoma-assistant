@@ -164,6 +164,8 @@ async def protected_app(provider_settings):
     async with app.router.lifespan_context(app):
         yield app
         db = app.state.db
+        await app.state.background_runs.close()
+        await db.queue.drop_test_queues()
         async with db.engine.begin() as c:
             await c.execute(text(f'DROP SCHEMA "{db.schema}" CASCADE'))
 
@@ -400,15 +402,25 @@ async def test_revocation_stops_an_inflight_agent_and_persists_partial_state(pro
         )
     )
     try:
-        await asyncio.sleep(0.25)
+        async with asyncio.timeout(8):
+            while True:
+                items = (await guest.call("GET", "/api/v1/conversations")).json()["items"]
+                if items and items[0]["messages"][-1].get("content"):
+                    break
+                await asyncio.sleep(0.03)
         assert (
             await admin.call("POST", f"/api/v1/admin/invitations/{data['id']}/revoke")
         ).status_code == 200
         response = await asyncio.wait_for(task, timeout=5)
         assert "邀请已撤销" in response.text
         table = protected_app.state.agent_store.runs
-        async with protected_app.state.db.engine.connect() as conn:
-            statuses = (await conn.execute(select(table.c.status))).scalars().all()
+        async with asyncio.timeout(5):
+            while True:
+                async with protected_app.state.db.engine.connect() as conn:
+                    statuses = (await conn.execute(select(table.c.status))).scalars().all()
+                if statuses == ["error"]:
+                    break
+                await asyncio.sleep(0.03)
         assert statuses == ["error"]
     finally:
         task.cancel()

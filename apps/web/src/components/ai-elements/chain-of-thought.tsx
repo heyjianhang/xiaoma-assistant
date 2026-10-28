@@ -61,9 +61,9 @@ export const ChainOfThought = memo(
 
     return (
       <ChainOfThoughtContext.Provider value={chainOfThoughtContext}>
-        <div className={cn("not-prose flex w-full flex-col gap-4", className)} {...props}>
+        <Collapsible open={isOpen} onOpenChange={setIsOpen} className={cn("not-prose flex w-full flex-col gap-4", className)} {...props}>
           {children}
-        </div>
+        </Collapsible>
       </ChainOfThoughtContext.Provider>
     );
   }
@@ -71,33 +71,31 @@ export const ChainOfThought = memo(
 
 export type ChainOfThoughtHeaderProps = ComponentProps<
   typeof CollapsibleTrigger
->;
+> & { icon?: LucideIcon | null; iconClassName?: string };
 
 export const ChainOfThoughtHeader = memo(
-  ({ className, children, ...props }: ChainOfThoughtHeaderProps) => {
-    const { isOpen, setIsOpen } = useChainOfThought();
+  ({ className, children, icon: Icon = BrainIcon, iconClassName, ...props }: ChainOfThoughtHeaderProps) => {
+    const { isOpen } = useChainOfThought();
 
     return (
-      <Collapsible onOpenChange={setIsOpen} open={isOpen}>
-        <CollapsibleTrigger
+      <CollapsibleTrigger
+        className={cn(
+          "flex w-full items-center gap-2 rounded-md text-muted-foreground text-sm transition-colors hover:text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+          className
+        )}
+        {...props}
+      >
+        {Icon && <Icon className={cn("size-4 shrink-0", iconClassName)} />}
+        <span className="flex-1 text-left">
+          {children ?? "处理过程"}
+        </span>
+        <ChevronDownIcon
           className={cn(
-            "flex w-full items-center gap-2 text-muted-foreground text-sm transition-colors hover:text-foreground",
-            className
+            "size-4 transition-transform",
+            isOpen ? "rotate-180" : "rotate-0"
           )}
-          {...props}
-        >
-          <BrainIcon className="size-4" />
-          <span className="flex-1 text-left">
-            {children ?? "处理过程"}
-          </span>
-          <ChevronDownIcon
-            className={cn(
-              "size-4 transition-transform",
-              isOpen ? "rotate-180" : "rotate-0"
-            )}
-          />
-        </CollapsibleTrigger>
-      </Collapsible>
+        />
+      </CollapsibleTrigger>
     );
   }
 );
@@ -180,21 +178,17 @@ export type ChainOfThoughtContentProps = ComponentProps<
 
 export const ChainOfThoughtContent = memo(
   ({ className, children, ...props }: ChainOfThoughtContentProps) => {
-    const { isOpen } = useChainOfThought();
-
     return (
-      <Collapsible open={isOpen}>
-        <CollapsibleContent
-          className={cn(
-            "mt-2 flex flex-col gap-3",
-            "data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2 text-popover-foreground outline-none data-[state=closed]:animate-out data-[state=open]:animate-in",
-            className
-          )}
-          {...props}
-        >
-          {children}
-        </CollapsibleContent>
-      </Collapsible>
+      <CollapsibleContent
+        className={cn(
+          "mt-2 flex flex-col gap-3",
+          "data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2 text-popover-foreground outline-none data-[state=closed]:animate-out data-[state=open]:animate-in",
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </CollapsibleContent>
     );
   }
 );
