@@ -136,3 +136,7 @@ SSE 使用 `Cache-Control: no-store, no-transform` 和 `X-Accel-Buffering: no`�
 - 普通聊天没有实际思考或工具记录时只显示等待行，正文开始后隐藏，不出现空折叠入口。底部任务条继续独立显示原生 write_todos 状态，默认折叠。
 
 参考：[LangChain 官方中间件](https://docs.langchain.com/oss/python/langchain/middleware/built-in)、[官方 Deep Agents 总结实现](https://github.com/langchain-ai/deepagents/blob/main/libs/deepagents/deepagents/middleware/summarization.py)。参考其预算与上下文管理思路，项目继续使用 LangChain `create_agent`。
+
+## 访问记录
+
+独立后台的邀请列表展示首次激活、最近访问、访问次数和提问次数；访问记录标签与访客详情展示页面、原文、SQL、用例和运行行为。身份沿用设备绑定，聊天正文保持原有隔离。实现与统计口径见 [访问记录](activity.md)。

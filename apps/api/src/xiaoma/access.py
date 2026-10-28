@@ -255,7 +255,7 @@ class AccessStore:
         if now >= row["expires_at"]:
             raise HTTPException(403, "邀请已到期")
 
-    async def redeem(self, token, jwk):
+    async def redeem(self, token, jwk, *, with_activation=False):
         fingerprint = key_fingerprint(jwk)
         async with self.db.engine.begin() as c:
             invite = (
@@ -290,13 +290,18 @@ class AccessStore:
                     .where(self.invites.c.id == invite["id"])
                     .values(bound_key=fingerprint, bound_user_id=user_id)
                 )
-            return await self.issue_session(
+            session_token = await self.issue_session(
                 c,
                 user_id,
                 jwk,
                 min(
                     invite["expires_at"], utcnow() + timedelta(hours=self.db.settings.session_hours)
                 ),
+            )
+            return (
+                (session_token, not bool(invite["bound_user_id"]))
+                if with_activation
+                else session_token
             )
 
     async def session(self, session_id=None, token=None):

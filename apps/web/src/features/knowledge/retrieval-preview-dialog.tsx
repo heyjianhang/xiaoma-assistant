@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useActivityView } from "@/lib/access/activity";
 import { useEffect, useState, type RefObject } from "react";
 import { ChevronLeftIcon, ChevronRightIcon, ExternalLinkIcon, FileTextIcon, XIcon } from "lucide-react";
 import { MarkdownPreview } from "@/components/markdown-preview";
@@ -27,6 +28,7 @@ export function RetrievalPreviewDialog({ hits, index, onIndexChange, onClose, re
   const { documents, repository, detailErrors } = useWorkspace();
   const [mobilePanel, setMobilePanel] = useState("source");
   const hit = hits[index];
+  useActivityView("document_view", { document_id: hit.documentId });
   const document = documents.find(document => document.id === hit.documentId);
   const chunk = document?.chunks.find(chunk => chunk.id === hit.chunkId);
   const sourceBlocks = document?.blocks.filter(block => chunk?.blockIds.includes(block.id)) ?? [];

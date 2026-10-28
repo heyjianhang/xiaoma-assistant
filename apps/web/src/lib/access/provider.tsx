@@ -2,6 +2,7 @@
 import { createContext, useContext, useEffect, useState, useRef, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { accessApi } from "./client";
+import { ActivityTracker } from "./activity";
 import { AccessScreen } from "@/features/access/access-screen";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -26,6 +27,6 @@ export function AccessProvider({ children }: { children: ReactNode }) {
     const timer = setInterval(() => { void refresh(); }, 30000);
     return () => { clearInterval(timer); window.removeEventListener("xiaoma-auth-invalid", invalid); };
   }, []);
-  return <Context.Provider value={{ user, refresh, logout }}>{loading ? <div className="grid min-h-svh place-items-center"><Skeleton className="h-48 w-80" /></div> : !user || pathname === "/access" ? <AccessScreen /> : <div key={user.id} className="contents">{children}</div>}</Context.Provider>;
+  return <Context.Provider value={{ user, refresh, logout }}>{loading ? <div className="grid min-h-svh place-items-center"><Skeleton className="h-48 w-80" /></div> : !user || pathname === "/access" ? <AccessScreen /> : <div key={user.id} className="contents"><ActivityTracker userId={user.id} />{children}</div>}</Context.Provider>;
 }
 export function useAccess() { const value = useContext(Context); if (!value) throw new Error("AccessProvider is required"); return value; }

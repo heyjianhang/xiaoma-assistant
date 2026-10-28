@@ -1,3 +1,7 @@
+"use client";
+
+import { useState } from "react";
+import { useActivityView } from "@/lib/access/activity";
 import { WorkspacePage, WorkspaceToolbar } from "@/components/workspace-page";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DatasetIntroduction } from "./dataset-introduction";
@@ -8,8 +12,10 @@ import { Text2SqlIntroduction } from "./text2sql-introduction";
 import { EvidenceIntroduction } from "./evidence-introduction";
 
 export function ProjectWorkspace() {
+  const [tab, setTab] = useState("overview");
+  useActivityView("page_view", { path: "/project", tab });
   return <WorkspacePage title="项目介绍">
-    <Tabs defaultValue="overview" className="min-h-0 flex-1 gap-4 overflow-hidden">
+    <Tabs value={tab} onValueChange={setTab} className="min-h-0 flex-1 gap-4 overflow-hidden">
       <WorkspaceToolbar>
         <div className="min-w-0 overflow-x-auto"><TabsList aria-label="项目介绍内容">
           <TabsTrigger value="overview" className="px-3">整体架构</TabsTrigger>

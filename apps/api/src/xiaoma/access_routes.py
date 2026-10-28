@@ -6,6 +6,7 @@ from pydantic import AwareDatetime, BaseModel, Field
 from sqlalchemy import select
 
 from .access import COOKIE
+from .activity_routes import record_login
 from .database import utcnow
 
 
@@ -79,6 +80,7 @@ def router(holder):
         await auth().rate_limit(request.client.host, "admin-login", 10)
         await auth().prove_login(body.challenge, body.public_key, body.signature, body.password)
         token = await auth().admin_login(body.password, body.public_key)
+        await record_login(holder, token, request)
         set_session(response, token)
         return {"ok": True}
 
@@ -86,7 +88,8 @@ def router(holder):
     async def redeem(body: Redeem, request: Request, response: Response):
         await auth().rate_limit(request.client.host, "redeem", 20)
         await auth().prove_login(body.challenge, body.public_key, body.signature, body.token)
-        token = await auth().redeem(body.token, body.public_key)
+        token, activated = await auth().redeem(body.token, body.public_key, with_activation=True)
+        await record_login(holder, token, request, activated=activated)
         set_session(response, token)
         return {"ok": True}
 
@@ -128,10 +131,18 @@ def router(holder):
                 .mappings()
                 .all()
             )
+        stats = await holder["activity"].invitation_stats()
         return {
             "items": [
                 {k: v for k, v in dict(row).items() if k not in ("token_hash", "bound_key")}
-                | {"bound": bool(row["bound_key"])}
+                | {
+                    "bound": bool(row["bound_key"]),
+                    "first_activated_at": None,
+                    "last_visited_at": None,
+                    "visit_count": 0,
+                    "question_count": 0,
+                }
+                | stats.get(row["id"], {})
                 for row in rows
             ]
         }

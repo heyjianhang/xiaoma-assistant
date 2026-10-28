@@ -13,6 +13,8 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from .access import ADMIN_ID, AccessStore, Principal
 from .access_routes import router as access_router
+from .activity import ActivityStore
+from .activity_routes import router as activity_router
 from .agent.background import BackgroundRuns
 from .agent.models import ModelCatalog
 from .agent.routes import router as agent_router
@@ -53,6 +55,7 @@ def create_app(
         business = BusinessDatabase(configuration)
         auth = AccessStore(db)
         agents = AgentStore(db)
+        activity = ActivityStore(db, auth, agents)
         models = ModelCatalog(configuration)
         agent_service = AgentService(db, business, auth, agents, models)
         background = BackgroundRuns(db, agent_service)
@@ -69,11 +72,13 @@ def create_app(
                 business=business,
                 auth=auth,
                 agents=agents,
+                activity=activity,
                 models=models,
                 agent_service=agent_service,
                 background_runs=background,
             )
             application.state.access = auth
+            application.state.activity = activity
             application.state.agent_store = agents
             application.state.model_catalog = models
             application.state.db = db
@@ -162,6 +167,7 @@ def create_app(
             return JSONResponse({"message": str(exc.detail)}, status_code=exc.status_code)
 
     app.include_router(access_router(holder))
+    app.include_router(activity_router(holder))
     app.include_router(agent_router(holder))
 
     @app.exception_handler(IngestionError)

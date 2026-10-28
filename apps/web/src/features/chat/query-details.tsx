@@ -1,5 +1,6 @@
 "use client";
 
+import { trackActivity, useActivityView } from "@/lib/access/activity";
 import { CodeIcon, CopyIcon } from "lucide-react";
 import { toast } from "sonner";
 import { CodeBlock } from "@/components/ai-elements/code-block";
@@ -34,13 +35,15 @@ export function SampleTable({ result, columns }: { result: QuerySample; columns?
   return <div className="max-h-80 min-w-0 max-w-full overflow-auto"><Table aria-label="查询数据"><TableHeader><TableRow>{fields.map(column => <TableHead key={column.key}>{column.label}</TableHead>)}</TableRow></TableHeader><TableBody>{result.rows.map((row, index) => <TableRow key={index}>{fields.map(column => <TableCell key={column.key}>{formatValue(row[column.key], column.format)}</TableCell>)}</TableRow>)}</TableBody></Table></div>;
 }
 export function SampleSql({ result }: { result: QuerySample }) {
+  const path = typeof window === "undefined" ? "/chat" : window.location.pathname;
+  useActivityView("sql_view", { path, target_id: path === "/project" ? undefined : result.id });
   return <div className="flex min-w-0 flex-col gap-3">
     <div className="flex flex-wrap items-center justify-between gap-2"><Badge variant="outline">{(result.executed || result.provenance.startsWith("真实只读")) ? "SQL 已实际执行 · 只读" : "参考 SQL"}</Badge><Button size="sm" variant="ghost" onClick={() => void navigator.clipboard.writeText(result.sql).then(() => toast.success("已复制 SQL")).catch(() => toast.error("当前浏览器不允许写入剪贴板"))}><CopyIcon data-icon="inline-start" />复制 SQL</Button></div>
     <div className="max-h-80 overflow-auto"><CodeBlock code={result.sql} language="sql" /></div>
   </div>;
 }
 export function QueryDetailsButton({ result }: { result: QuerySample }) {
-  return <Dialog><DialogTrigger asChild><Button size="sm" variant="outline"><CodeIcon data-icon="inline-start" />数据与 SQL</Button></DialogTrigger><DialogContent className="max-h-[85svh] min-w-0 overflow-hidden sm:max-w-3xl">
+  return <Dialog onOpenChange={open => { if (open) trackActivity("sql_view", { target_id: window.location.pathname === "/project" ? undefined : result.id }); }}><DialogTrigger asChild><Button size="sm" variant="outline"><CodeIcon data-icon="inline-start" />数据与 SQL</Button></DialogTrigger><DialogContent className="max-h-[85svh] min-w-0 overflow-hidden sm:max-w-3xl">
     <DialogHeader><DialogTitle>数据与 SQL</DialogTitle><DialogDescription>{result.scope}</DialogDescription></DialogHeader>
     <Tabs defaultValue="data" className="min-h-0 min-w-0"><TabsList><TabsTrigger value="data">数据</TabsTrigger><TabsTrigger value="sql">SQL</TabsTrigger><TabsTrigger value="schema">选表与字段</TabsTrigger></TabsList>
       <TabsContent value="data" className="min-h-0 min-w-0"><SampleTable result={result} /></TabsContent>

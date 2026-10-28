@@ -155,6 +155,8 @@ sh scripts/xiaoma.sh inspect RUN_ID
 
 ## 代码与文档导航
 
+- [访问记录与邀请统计](docs/activity.md)
+
 - [Agent 最终组装](apps/api/src/xiaoma/agent/builder.py)：提示词、模型、工具、中间件。
 - [运行参数与容错](docs/agent-runtime.md)：Model Profile、压缩预算、调用限额和重试。
 - [Agent 与访问控制](docs/agent-and-access.md)：工具、Skill、邀请和隔离。

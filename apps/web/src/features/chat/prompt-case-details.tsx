@@ -1,11 +1,13 @@
 "use client";
 
+import { useActivityView } from "@/lib/access/activity";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardAction, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { MarkdownPreview } from "@/components/markdown-preview";
 import { documentTitles, promptSetup, type PromptCase } from "./prompt-cases";
 
 export function PromptCaseDetails({ prompt }: { prompt: PromptCase }) {
+  useActivityView("test_case_view", { target_id: prompt.id });
   return <div className="flex min-w-0 flex-col gap-4 p-0.5">
     <div className="flex flex-wrap gap-2">
       <Badge variant="secondary">{prompt.group}</Badge>
