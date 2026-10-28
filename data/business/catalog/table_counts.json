@@ -1,0 +1,12 @@
+{
+  "regions": 6,
+  "customers": 600,
+  "categories": 5,
+  "suppliers": 5,
+  "products": 30,
+  "orders": 5000,
+  "order_items": 15027,
+  "refunds": 474,
+  "refund_items": 477,
+  "demo_context": 1
+}

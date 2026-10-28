@@ -1,0 +1,173 @@
+{
+  "orders": {
+    "title": "订单",
+    "previewColumns": [
+      "order_no",
+      "paid_amount",
+      "order_status",
+      "paid_at"
+    ],
+    "labels": {
+      "order_id": "订单 ID",
+      "order_no": "订单号",
+      "customer_id": "客户 ID",
+      "region_id": "地区 ID",
+      "order_status": "订单状态",
+      "payment_channel": "支付渠道",
+      "created_at": "创建时间",
+      "paid_at": "支付时间",
+      "promised_ship_at": "承诺发货时间",
+      "shipped_at": "发货时间",
+      "delivered_at": "签收时间",
+      "paid_amount": "实付金额"
+    }
+  },
+  "order_items": {
+    "title": "订单明细",
+    "previewColumns": [
+      "order_item_id",
+      "order_id",
+      "product_id",
+      "quantity",
+      "paid_amount"
+    ],
+    "labels": {
+      "order_item_id": "订单明细 ID",
+      "order_id": "订单 ID",
+      "product_id": "商品 ID",
+      "category_id": "品类 ID",
+      "quantity": "数量",
+      "unit_paid_price": "实付单价",
+      "paid_amount": "实付金额"
+    }
+  },
+  "refunds": {
+    "title": "退款单",
+    "previewColumns": [
+      "refund_no",
+      "requested_amount",
+      "refund_status",
+      "completed_at"
+    ],
+    "labels": {
+      "refund_id": "退款 ID",
+      "refund_no": "退款单号",
+      "order_id": "订单 ID",
+      "refund_status": "退款状态",
+      "refund_kind": "退款类型",
+      "reason_code": "退款原因",
+      "applied_at": "申请时间",
+      "accepted_at": "验收时间",
+      "completed_at": "到账时间",
+      "payment_channel": "支付渠道",
+      "requested_amount": "申请金额",
+      "acceptance_note": "验收备注"
+    }
+  },
+  "refund_items": {
+    "title": "退款明细",
+    "previewColumns": [
+      "refund_item_id",
+      "refund_id",
+      "order_item_id",
+      "quantity",
+      "amount"
+    ],
+    "labels": {
+      "refund_item_id": "退款明细 ID",
+      "refund_id": "退款 ID",
+      "order_item_id": "订单明细 ID",
+      "quantity": "数量",
+      "amount": "退款金额"
+    }
+  },
+  "customers": {
+    "title": "客户",
+    "previewColumns": [
+      "customer_id",
+      "customer_name",
+      "customer_type",
+      "region_id"
+    ],
+    "labels": {
+      "customer_id": "客户 ID",
+      "customer_name": "客户名称",
+      "region_id": "地区 ID",
+      "customer_type": "客户类型"
+    }
+  },
+  "products": {
+    "title": "商品",
+    "previewColumns": [
+      "product_name",
+      "list_price",
+      "unit",
+      "is_active"
+    ],
+    "labels": {
+      "product_id": "商品 ID",
+      "product_name": "商品名称",
+      "category_id": "品类 ID",
+      "supplier_id": "供应商 ID",
+      "unit": "单位",
+      "list_price": "当前标价",
+      "is_active": "是否在售"
+    }
+  },
+  "categories": {
+    "title": "品类",
+    "previewColumns": [
+      "category_id",
+      "category_name",
+      "storage_condition"
+    ],
+    "labels": {
+      "category_id": "品类 ID",
+      "category_name": "品类名称",
+      "storage_condition": "储运条件"
+    }
+  },
+  "suppliers": {
+    "title": "供应商",
+    "previewColumns": [
+      "supplier_id",
+      "supplier_name",
+      "qualification_status"
+    ],
+    "labels": {
+      "supplier_id": "供应商 ID",
+      "supplier_name": "供应商名称",
+      "qualification_status": "准入状态"
+    }
+  },
+  "regions": {
+    "title": "地区",
+    "previewColumns": [
+      "region_id",
+      "region_name"
+    ],
+    "labels": {
+      "region_id": "地区 ID",
+      "region_name": "地区名称"
+    }
+  },
+  "demo_context": {
+    "title": "演示时间与口径",
+    "previewColumns": [
+      "reference_datetime",
+      "period_start",
+      "cutoff_exclusive",
+      "timezone",
+      "synthetic"
+    ],
+    "labels": {
+      "singleton": "单行键",
+      "seed": "随机种子",
+      "reference_datetime": "参考时刻",
+      "period_start": "统计起点",
+      "cutoff_exclusive": "统计截止",
+      "timezone": "时区",
+      "synthetic": "合成数据"
+    }
+  }
+}

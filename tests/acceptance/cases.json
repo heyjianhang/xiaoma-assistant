@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "description": "人工或真实模型验收清单。预期不进入知识库或Agent上下文；并非自动判分结果。",
+  "time_window": "2026-09-01T00:00:00+08:00 <= paid_at < 2026-10-01T00:00:00+08:00；退款完成截止2026-10-01T00:00:00+08:00之前",
+  "cases": [
+    {
+      "id": "A01", "category": "rag",
+      "question": "电子钱包退款，新旧制度分别要求多久？按什么时间选择版本？",
+      "required_documents": ["refund-policy-v1.pdf", "refund-policy-v2.pdf"],
+      "expected_route": "RAG",
+      "checks": ["实际检索两版制度", "旧版48自然小时，新版24自然小时", "按applied_at选择版本，分界为2026-09-01", "说明验收后到成功到账的计时口径", "引用文档及对应条款，可打开原文"]
+    },
+    {
+      "id": "A02", "category": "sql",
+      "question": "查询全部订单总数，不限制日期。",
+      "required_documents": [], "expected_route": "SQL",
+      "checks": ["list_tables后查看候选表，再link_schema，最后execute_readonly_sql", "订单总数为5000", "使用只读连接实际执行", "自然语言摘要与结果一致", "不擅自增加日期限制"]
+    },
+    {
+      "id": "A03", "category": "sql",
+      "question": "按全部订单的订单状态统计数量并画柱状图，不限制日期，核对合计。",
+      "required_documents": [], "expected_route": "SQL",
+      "checks": ["显式Schema Linking后实际执行", "fulfilled=4066、paid=735、created=107、cancelled=92，合计5000", "render_chart引用本轮真实result_id", "图表与摘要的数值一致"]
+    },
+    {
+      "id": "A04", "category": "hybrid",
+      "question": "订单110有申请和到账时间，能否判断退款是否超时？请查制度和实际记录。",
+      "required_documents": ["refund-policy-v2.pdf"], "expected_route": "HYBRID",
+      "checks": ["同时实际检索制度与执行SQL", "识别accepted_at为空", "明确无法判定，不用applied_at或其他时间补填", "展示记录与制度依据"]
+    },
+    {
+      "id": "A05", "category": "ambiguity",
+      "question": "请计算2026年9月的售后异常率。",
+      "required_documents": ["metric-definitions.pdf"], "expected_route": "RAG/澄清",
+      "checks": ["检查现有指标定义", "指出售后异常率未定义", "询问分子、分母与范围，或提供明确标注的候选指标", "不自动替换成退款率并执行计算"]
+    },
+    {
+      "id": "A06", "category": "conflict",
+      "question": "2026年9月华东生鲜的订单退款率是多少？月报写的数值是否一致？",
+      "required_documents": ["metric-definitions.pdf", "monthly-report.pdf"], "expected_route": "HYBRID",
+      "checks": ["同时读取月报、口径和实际业务数据", "先对齐时间、地区、品类、订单粒度与截止时间", "数据库100支付订单、8成功退款订单，8%", "月报2%，同时呈现，不静默采用一方", "指出差6个百分点，区分退款单数与去重退款订单数", "文档引用与SQL结果都能追溯"]
+    },
+    {
+      "id": "A07", "category": "anomaly",
+      "question": "2026年9月西北滋补礼盒退款率100%，是否说明该品类普遍有问题？",
+      "required_documents": ["metric-definitions.pdf"], "expected_route": "HYBRID",
+      "checks": ["查询得到3个支付订单、3个成功退款订单", "展示100%的分子分母和小样本提示", "不外推普遍品质问题或因果结论"]
+    },
+    {
+      "id": "A08", "category": "ambiguity",
+      "question": "生鲜品类退款率高，是因为政策太宽松还是数据异常？",
+      "required_documents": ["refund-policy-v2.pdf", "metric-definitions.pdf"], "expected_route": "澄清/随后HYBRID",
+      "checks": ["先明确时间、地区、指标和比较基准，或明确说明采用的范围", "如继续分析，分别检索政策和实际查询数据", "检查样本量、重复JOIN与缺失", "不将相关性当作政策导致退款的因果证明"]
+    },
+    {
+      "id": "A09", "category": "rag",
+      "question": "生鲜供应商准入续页清单第19项是什么，由谁核验？",
+      "required_documents": ["supplier-admission.pdf"], "expected_route": "RAG",
+      "checks": ["实际检索续页表格与列标题", "答案依据原文第19项及核验责任列", "引用能定位到对应文档、条款/表格与页", "未召回该行时明确证据不足，不猜测"]
+    }
+  ]
+}

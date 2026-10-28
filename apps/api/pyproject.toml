@@ -1,0 +1,53 @@
+[project]
+name = "xiaoma-api"
+version = "0.1.0"
+description = "小马助手：文档检索、显式 Schema Linking 与只读业务查询 Agent"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+  "asyncpg>=0.30,<1",
+  "fastapi>=0.115,<1",
+  "httpx>=0.28,<1",
+  "langchain-core>=1,<2",
+  "langchain-openai>=1,<2",
+  "langchain-postgres>=0.0.16,<1",
+  "langgraph>=1,<2",
+  "langsmith>=0.3,<1",
+  "markdown-it-py>=3,<5",
+  "pydantic-settings>=2.7,<3",
+  "python-multipart>=0.0.20",
+  "python-dotenv>=1,<2",
+  "sqlalchemy[asyncio]>=2,<3",
+  "uvicorn>=0.34,<1",
+  "langchain>=1.1,<2",
+  "sqlglot>=28,<40",
+  "cryptography>=43",
+  "pyyaml>=6,<7",
+]
+
+[dependency-groups]
+dev = ["langgraph-cli[inmem]>=0.4,<1", "pytest>=8,<10", "pytest-asyncio>=1,<2", "respx>=0.22,<1", "ruff>=0.14,<1"]
+
+[project.scripts]
+xiaoma = "xiaoma.debug_cli.__main__:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/xiaoma"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+markers = ["integration: uses an isolated real PostgreSQL schema and a test embedding HTTP service"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["xiaoma"]

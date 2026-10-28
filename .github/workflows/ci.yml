@@ -1,0 +1,63 @@
+name: Checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: xiaoma
+          POSTGRES_PASSWORD: ci-only-local-password
+          POSTGRES_DB: xiaoma
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U xiaoma -d xiaoma"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: astral-sh/setup-uv@v6
+      - name: Install locked dependencies
+        run: uv sync --directory apps/api --locked
+      - name: Configure isolated CI database
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          content = Path('.env.example').read_text()
+          content = content.replace('CHANGE_ME', 'ci-only-local-password')
+          content = content.replace('15433', '5432')
+          Path('.env').write_text(content)
+          PY
+      - name: Import synthetic business data
+        run: uv run --project apps/api python scripts/import_business.py
+      - run: make check-backend
+      - run: make check-repository
+
+  web:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26.8.1'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '11.25.0'
+      - run: pnpm --dir apps/web install --frozen-lockfile
+      - run: make check-web
